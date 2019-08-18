@@ -28,22 +28,6 @@ local NUM_STATS_TO_SHOW = 6;
 local LeftStatsTable = { }
 local RightStatsTable = { }
 
---[[
-print("Crit chance: " .. GetCritChance());
-print("Spell Crit chance: " .. GetSpellCritChance(2));
-print("Dodge Chance: " .. GetDodgeChance());
-print("Parry Chance: " .. GetParryChance());
-print("Shield Block: " .. GetShieldBlock());
-print("Damage: " .. UnitDamage("player"));
-print("DPS: " .. UnitDamage("player") / UnitAttackSpeed("player"));
-print("Attack speed: " .. UnitAttackSpeed("player"));
-print("Attack power: " .. UnitAttackPower("player"));
-print("Defense: " .. UnitDefense("player"));
-print("Spell Haste: " .. UnitSpellHaste("player"));
-print("Hit: " .. GetHitModifier());
-print("Spell Hit: " .. GetSpellHitModifier());
---]]
-
 function UIConfig:InitializeStatsFrames(leftParentFrame, rightParentFrame)
     local offsetStepY = 15;
     local accumulatedOffsetY = 0;
@@ -65,6 +49,7 @@ function UIConfig:InitializeStatsFrames(leftParentFrame, rightParentFrame)
         RightStatsTable[i]:SetPoint("LEFT", rightParentFrame, "TOPLEFT", 10, -actualOffset);
         RightStatsTable[i]:SetWidth(130);
     end
+    TestPrint();
 end
 
 function UIConfig:SetCharacterStats(statsTable, category)
@@ -89,20 +74,20 @@ function UIConfig:SetCharacterStats(statsTable, category)
         statsTable[6]:Hide();
     elseif category == "Melee" then
         -- damage, Att Power, speed, hit raiting, crit chance
-        PaperDollFrame_SetDamage(statsTable[1], "player");
-        PaperDollFrame_SetAttackPower(statsTable[2], "player");
+        CSC_PaperDollFrame_SetDamage(statsTable[1], "player");
+        CSC_PaperDollFrame_SetMeleeAttackPower(statsTable[2], "player");
         PaperDollFrame_SetAttackSpeed(statsTable[3], "player");
-        PaperDollFrame_SetCritChance(statsTable[4], "player");
+        CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
         --PaperDollFrame_SetCritChance(statsTable[5], "player");
         --PaperDollFrame_SetCritChance(statsTable[6], "player");
         statsTable[5]:Hide();
         statsTable[6]:Hide();
     elseif category == "Ranged" then
         -- 
-        PaperDollFrame_SetDamage(statsTable[1], "player");
-        PaperDollFrame_SetAttackPower(statsTable[2], "player");
+        CSC_PaperDollFrame_SetDamage(statsTable[1], "player");
+        CSC_PaperDollFrame_SetRangedAttackPower(statsTable[2], "player");
         PaperDollFrame_SetAttackSpeed(statsTable[3], "player");
-        PaperDollFrame_SetCritChance(statsTable[4], "player");
+        CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
         statsTable[5]:Hide();
         statsTable[6]:Hide();
     elseif category == "Spell" then
@@ -110,9 +95,8 @@ function UIConfig:SetCharacterStats(statsTable, category)
         PaperDollFrame_SetSpellPower(statsTable[1], "player");
         PaperDollFrame_SetManaRegen(statsTable[2], "player");
         --PaperDollFrame_SetAttackSpeed(statsTable[3], "player");
-        --PaperDollFrame_SetCritChance(statsTable[4], "player");
+        CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
         statsTable[3]:Hide();
-        statsTable[4]:Hide();
         statsTable[5]:Hide();
         statsTable[6]:Hide();
     end

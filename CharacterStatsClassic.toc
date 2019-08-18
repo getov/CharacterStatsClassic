@@ -9,3 +9,4 @@
 
 CharacterStatsClassicUI.lua
 CharacterStatsClassicCore.lua
+CharacterStatsClassicUtils.lua
