@@ -28,6 +28,16 @@ local NUM_STATS_TO_SHOW = 6;
 local LeftStatsTable = { }
 local RightStatsTable = { }
 
+local function CSC_ResetStatFrames(statFrames)
+    for i=1, NUM_STATS_TO_SHOW, 1 do
+        statFrames[i]:Hide();
+        statFrames[i]:SetScript("OnEnter", statFrames[i].OnEnterCallback);
+        statFrames[i].tooltip = nil;
+        statFrames[i].tooltip2 = nil;
+        statFrames[i].tooltip3 = nil;
+    end
+end
+
 function UIConfig:InitializeStatsFrames(leftParentFrame, rightParentFrame)
     local offsetStepY = 15;
     local accumulatedOffsetY = 0;
@@ -44,63 +54,47 @@ function UIConfig:InitializeStatsFrames(leftParentFrame, rightParentFrame)
         LeftStatsTable[i] = CreateFrame("Frame", nil, leftParentFrame, "CharacterStatFrameTemplate");
         LeftStatsTable[i]:SetPoint("LEFT", leftParentFrame, "TOPLEFT", 10, -actualOffset);
         LeftStatsTable[i]:SetWidth(130);
+        LeftStatsTable[i].OnEnterCallback = LeftStatsTable[i]:GetScript("OnEnter");
 
         RightStatsTable[i] = CreateFrame("Frame", nil, rightParentFrame, "CharacterStatFrameTemplate");
         RightStatsTable[i]:SetPoint("LEFT", rightParentFrame, "TOPLEFT", 10, -actualOffset);
         RightStatsTable[i]:SetWidth(130);
+        RightStatsTable[i].OnEnterCallback = RightStatsTable[i]:GetScript("OnEnter");
     end
-    TestPrint();
 end
 
 function UIConfig:SetCharacterStats(statsTable, category)
+    CSC_ResetStatFrames(statsTable);
+
     if category == "Base Stats" then
         -- str, agility, stamina, intelect, spirit, armor
-        PaperDollFrame_SetStat(statsTable[1], "player", LE_UNIT_STAT_STRENGTH);
-        PaperDollFrame_SetStat(statsTable[2], "player", LE_UNIT_STAT_AGILITY);
-        PaperDollFrame_SetStat(statsTable[3], "player", LE_UNIT_STAT_INTELLECT);
-        PaperDollFrame_SetStat(statsTable[4], "player", LE_UNIT_STAT_STAMINA);
-        --PaperDollFrame_SetStat(statsTable[5], "player", LE_UNIT_STAT_STRENGTH);
-        --PaperDollFrame_SetStat(statsTable[6], "player", LE_UNIT_STAT_STRENGTH);
-        statsTable[5]:Hide();
-        statsTable[6]:Hide();
+        CSC_PaperDollFrame_SetPrimaryStats(statsTable, "player");
     elseif category == "Defenses" then
         -- armor, defense, dodge, parry, block
-        PaperDollFrame_SetArmor(statsTable[1], "player");
-        PaperDollFrame_SetDodge(statsTable[2], "player");
-        PaperDollFrame_SetParry(statsTable[3], "player");
-        PaperDollFrame_SetBlock(statsTable[4], "player");
-        PaperDollFrame_SetStagger(statsTable[5], "player");
-        --PaperDollFrame_SetArmor(statsTable[6], "player");
-        statsTable[6]:Hide();
+        CSC_PaperDollFrame_SetArmor(statsTable[1], "player");
+        CSC_PaperDollFrame_SetDefense(statsTable[2], "player");
+        CSC_PaperDollFrame_SetDodge(statsTable[3], "player");
+        CSC_PaperDollFrame_SetParry(statsTable[4], "player");
+        CSC_PaperDollFrame_SetBlock(statsTable[5], "player");
+        CSC_PaperDollFrame_SetStagger(statsTable[6], "player");
     elseif category == "Melee" then
         -- damage, Att Power, speed, hit raiting, crit chance
-        CSC_PaperDollFrame_SetDamage(statsTable[1], "player");
+        CSC_PaperDollFrame_SetDamage(statsTable[1], "player", category);
         CSC_PaperDollFrame_SetMeleeAttackPower(statsTable[2], "player");
-        PaperDollFrame_SetAttackSpeed(statsTable[3], "player");
+        CSC_PaperDollFrame_SetAttackSpeed(statsTable[3], "player");
         CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
-        --PaperDollFrame_SetCritChance(statsTable[5], "player");
-        --PaperDollFrame_SetCritChance(statsTable[6], "player");
-        statsTable[5]:Hide();
-        statsTable[6]:Hide();
+        CSC_PaperDollFrame_SetHitChance(statsTable[5], "player");
     elseif category == "Ranged" then
-        -- 
-        CSC_PaperDollFrame_SetDamage(statsTable[1], "player");
+        CSC_PaperDollFrame_SetDamage(statsTable[1], "player", category);
         CSC_PaperDollFrame_SetRangedAttackPower(statsTable[2], "player");
-        PaperDollFrame_SetAttackSpeed(statsTable[3], "player");
+        CSC_PaperDollFrame_SetAttackSpeed(statsTable[3], "player");
         CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
-        statsTable[5]:Hide();
-        statsTable[6]:Hide();
     elseif category == "Spell" then
         -- bonus dmg, bonus healing, hit raiting, crit chance, haste raiting, mana regen
         PaperDollFrame_SetSpellPower(statsTable[1], "player");
         PaperDollFrame_SetManaRegen(statsTable[2], "player");
-        --PaperDollFrame_SetAttackSpeed(statsTable[3], "player");
-        CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
-        statsTable[3]:Hide();
-        statsTable[5]:Hide();
-        statsTable[6]:Hide();
+        CSC_PaperDollFrame_SetCritChance(statsTable[3], "player", category);
     end
-    --print(category)
 end
 
 function UIConfig:CreateMenu()
