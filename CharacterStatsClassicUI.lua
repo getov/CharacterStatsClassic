@@ -76,7 +76,7 @@ function UIConfig:SetCharacterStats(statsTable, category)
         CSC_PaperDollFrame_SetDodge(statsTable[3], "player");
         CSC_PaperDollFrame_SetParry(statsTable[4], "player");
         CSC_PaperDollFrame_SetBlock(statsTable[5], "player");
-        CSC_PaperDollFrame_SetStagger(statsTable[6], "player");
+        --CSC_PaperDollFrame_SetStagger(statsTable[6], "player"); Is this useful?
     elseif category == "Melee" then
         -- damage, Att Power, speed, hit raiting, crit chance
         CSC_PaperDollFrame_SetDamage(statsTable[1], "player", category);
@@ -90,16 +90,17 @@ function UIConfig:SetCharacterStats(statsTable, category)
         CSC_PaperDollFrame_SetAttackSpeed(statsTable[3], "player");
         CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
     elseif category == "Spell" then
-        -- bonus dmg, bonus healing, hit raiting, crit chance, haste raiting, mana regen
-        PaperDollFrame_SetSpellPower(statsTable[1], "player");
-        PaperDollFrame_SetManaRegen(statsTable[2], "player");
-        CSC_PaperDollFrame_SetCritChance(statsTable[3], "player", category);
+        -- bonus dmg, bonus healing, crit chance, mana regen
+        CSC_PaperDollFrame_SetSpellPower(statsTable[1], "player");
+        CSC_PaperDollFrame_SetHealing(statsTable[2], "player");
+        CSC_PaperDollFrame_SetManaRegen(statsTable[3], "player");
+        CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
     end
 end
 
 function UIConfig:CreateMenu()
     CSC_UIFrame.CharacterStatsPanel = CreateFrame("Frame", nil, PaperDollFrame); --CharacterFrameInsetRight
-	CSC_UIFrame.CharacterStatsPanel:SetPoint("LEFT", CharacterFrameInset, "BOTTOMLEFT", 32, 0);
+	CSC_UIFrame.CharacterStatsPanel:SetPoint("LEFT", CharacterFrameInset, "BOTTOMLEFT", 32, 10);
 	CSC_UIFrame.CharacterStatsPanel:SetHeight(320);
     CSC_UIFrame.CharacterStatsPanel:SetWidth(200);
 
@@ -111,14 +112,6 @@ function UIConfig:CreateMenu()
 end
 
 function UIConfig:UpdateStats()
-    --for i = 1, NUM_STATS_TO_SHOW do
-        --if getn(LeftStatsTable) > 0 then
-        
-       -- end
-        --if getn(RightStatsTable) > 0 then
-        
-        --end
-    --end
     UIConfig:SetCharacterStats(LeftStatsTable, statsDropdownList[UISettingsCharacter.selectedLeftStatsCategory]);
     UIConfig:SetCharacterStats(RightStatsTable, statsDropdownList[UISettingsCharacter.selectedRightStatsCategory]);
 end

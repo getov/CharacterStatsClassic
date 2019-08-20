@@ -302,8 +302,14 @@ function CSC_PaperDollFrame_SetCritChance(statFrame, unit, category)
 end
 
 function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
-	local hitChance = Round(GetHitModifier());
-	CSC_PaperDollFrame_SetLabelAndText(statFrame, "Hit", hitChance, true, hitChance);
+	local hitChance = GetHitModifier(); -- Round ?
+	
+	if not hitChance then
+		hitChance = 0; -- Remove for classic ?
+	end
+
+	local hitChanceText = hitChance;
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, "Hit", hitChanceText, true, hitChance);
 	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE.."Chance to hit enemies at your level"..FONT_COLOR_CODE_CLOSE;
 	statFrame:Show();
 end
@@ -368,6 +374,7 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 	local valueNum = max(0, base + posBuff + negBuff);
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, "Defense", valueText, false, valueNum);
 	statFrame.tooltip = tooltipText;
+	statFrame.tooltip2 = "Reduces the chance to be critically hit";
 	statFrame:Show();
 end
 
@@ -428,5 +435,66 @@ function CSC_PaperDollFrame_SetStagger(statFrame, unit)
 		statFrame.tooltip3 = nil;
 	end
 
+	statFrame:Show();
+end
+
+-- SPELL --
+function CSC_PaperDollFrame_SetSpellPower(statFrame, unit)
+	local minModifier = 0;
+
+	local holySchool = 2;
+	-- Start at 2 to skip physical damage
+	minModifier = GetSpellBonusDamage(holySchool);
+
+	if (statFrame.bonusDamage) then
+		table.wipe(statFrame.bonusDamage);
+	else
+		statFrame.bonusDamage = {};
+	end
+	statFrame.bonusDamage[holySchool] = minModifier;
+	for i=(holySchool+1), MAX_SPELL_SCHOOLS do
+		local bonusDamage = GetSpellBonusDamage(i);
+		minModifier = min(minModifier, bonusDamage);
+		statFrame.bonusDamage[i] = bonusDamage;
+	end
+
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_SPELLPOWER, BreakUpLargeNumbers(minModifier), false, minModifier);
+	statFrame.tooltip = STAT_SPELLPOWER;
+	statFrame.tooltip2 = STAT_SPELLPOWER_TOOLTIP;
+
+	statFrame.minModifier = minModifier;
+	--statFrame.unit = unit;
+	--statFrame.onEnterFunc = CharacterSpellBonusDamage_OnEnter;
+	statFrame:Show();
+end
+
+function CSC_PaperDollFrame_SetManaRegen(statFrame, unit)
+
+	if ( not UnitHasMana(unit) ) then
+		CSC_PaperDollFrame_SetLabelAndText(statFrame, MANA_REGEN, NOT_APPLICABLE, false, 0);
+		statFrame.tooltip = nil;
+		statFrame:Show();
+		return;
+	end
+
+	local base, combat = GetManaRegen();
+	-- All mana regen stats are displayed as mana/5 sec.
+	base = floor(base * 5.0);
+	combat = floor(combat * 5.0);
+	local baseText = BreakUpLargeNumbers(base);
+	local combatText = BreakUpLargeNumbers(combat);
+	-- Combat mana regen is most important to the player, so we display it as the main value
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, MANA_REGEN, combatText, false, combat);
+	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE .. format(PAPERDOLLFRAME_TOOLTIP_FORMAT, MANA_REGEN) .. " " .. combatText .. FONT_COLOR_CODE_CLOSE;
+	-- Base (out of combat) regen is displayed only in the subtext of the tooltip
+	statFrame.tooltip2 = format(MANA_REGEN_TOOLTIP, baseText);
+	statFrame:Show();
+end
+
+function CSC_PaperDollFrame_SetHealing(statFrame, unit)
+	local healing = GetSpellBonusHealing();
+	local healingText = healing;
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, "Healing", healingText, false, healing);
+	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE.."Bonus healing"..FONT_COLOR_CODE_CLOSE;
 	statFrame:Show();
 end
