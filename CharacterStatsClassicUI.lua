@@ -99,8 +99,11 @@ function UIConfig:SetCharacterStats(statsTable, category)
 end
 
 function UIConfig:CreateMenu()
-    CSC_UIFrame.CharacterStatsPanel = CreateFrame("Frame", nil, PaperDollFrame); --CharacterFrameInsetRight
-	CSC_UIFrame.CharacterStatsPanel:SetPoint("LEFT", CharacterFrameInset, "BOTTOMLEFT", 32, 10);
+    -- Hide the default stats
+    CharacterAttributesFrame:Hide();
+
+    CSC_UIFrame.CharacterStatsPanel = CreateFrame("Frame", nil, CharacterFrame); --CharacterFrameInsetRight
+	CSC_UIFrame.CharacterStatsPanel:SetPoint("LEFT", CharacterFrame, "BOTTOMLEFT", 50, 75);
 	CSC_UIFrame.CharacterStatsPanel:SetHeight(320);
     CSC_UIFrame.CharacterStatsPanel:SetWidth(200);
 

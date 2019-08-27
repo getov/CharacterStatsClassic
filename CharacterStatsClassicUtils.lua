@@ -2,18 +2,6 @@
     Util functions that wrap my interface and the Blizzard's WoW Classic lua API code for ease of use
 ]]
 
---[[
-	- DONE - PaperDollFrame_SetPrimaryStats();
-	- WONT DO - PaperDollFrame_SetResistances();
-	- DONE - PaperDollFrame_SetArmor();
-	- WONT DO? - PaperDollFrame_SetAttackBothHands();
-	- DONE - PaperDollFrame_SetDamage();
-	- DONE - PaperDollFrame_SetAttackPower();
-	- WONT DO? - PaperDollFrame_SetRangedAttack();
-	- DONE - PaperDollFrame_SetRangedDamage(); - the same as SetDamage but using UnitRangedDamage
-	- DONE - PaperDollFrame_SetRangedAttackPower();
-]]
-
 local function DebugBreakPrint()
     print("ERROR");
 end
@@ -83,11 +71,11 @@ function CSC_PaperDollFrame_SetPrimaryStats(statFrames, unit)
 		"AGILITY",
 		"STAMINA",
 		"INTELLECT",
-		--"SPIRIT", -- fix for Classic
+		"SPIRIT", -- fix for Classic
 	}
 
 	-- Fix for classic (NUM_STATS instead of NUM_STATS-1)
-	for i=1, NUM_STATS-1, 1 do
+	for i=1, NUM_STATS, 1 do
 		local frameText;
 
 		local stat;
@@ -212,7 +200,7 @@ function CSC_PaperDollFrame_SetDamage(statFrame, unit, category)
     statFrame.damage = damageTooltip;
 	statFrame.attackSpeed = speed;
     statFrame.dps = damagePerSecond;
-    statFrame.unit = unit; -- not in classic
+    --statFrame.unit = unit; -- not in classic
 
     -- If there's an offhand speed then add the offhand info to the tooltip
 	if ( offhandSpeed and category == "Melee") then
@@ -258,17 +246,19 @@ end
 
 function CSC_PaperDollFrame_SetRangedAttackPower(statFrame, unit)
     
-	-- If no ranged attack then set to n/a
-    if ( PaperDollFrame.noRanged ) then
-        -- TODO: we need to set the label too
-        statFrame.Value:SetText(NOT_APPLICABLE);
+	--[[ If no ranged attack then set to n/a
+	if ( PaperDollFrame.noRanged ) then
+		print("NO RANGED");
+		CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_ATTACK_POWER, NOT_APPLICABLE, false, 0);
 		statFrame.tooltip = nil;
+		statFrame:Show();
 		return;
 	end
-    if ( HasWandEquipped() ) then
-        -- TODO: we need to set the label too
-        statFrame.Value:SetText("--");
+	--]]
+	if ( HasWandEquipped() ) then
+		CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_ATTACK_POWER, NOT_APPLICABLE, false, 0);
 		statFrame.tooltip = nil;
+		statFrame:Show();
 		return;
 	end
 
@@ -305,7 +295,7 @@ function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
 	local hitChance = GetHitModifier(); -- Round ?
 	
 	if not hitChance then
-		hitChance = 0; -- Remove for classic ?
+		hitChance = 0;
 	end
 
 	local hitChanceText = hitChance;
@@ -359,10 +349,8 @@ function CSC_PaperDollFrame_SetArmor(statFrame, unit)
 end
 
 function CSC_PaperDollFrame_SetDefense(statFrame, unit)
-	--local base, modifier = UnitDefense(unit); -- Classic
-	local base, modifier = 0, 0;
-	local DEFENSE_COLON = "Defense"; -- Remove for classic
-
+	local base, modifier = UnitDefense(unit);
+	
 	local posBuff = 0;
 	local negBuff = 0;
 	if ( modifier > 0 ) then
@@ -382,7 +370,7 @@ function CSC_PaperDollFrame_SetDodge(statFrame, unit)
 	local chance = GetDodgeChance();
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_DODGE, chance, true, chance);
 	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, DODGE_CHANCE).." "..string.format("%.2F", chance).."%"..FONT_COLOR_CODE_CLOSE;
-	statFrame.tooltip2 = format(CR_DODGE_TOOLTIP, GetCombatRating(CR_DODGE), GetCombatRatingBonus(CR_DODGE));
+	--statFrame.tooltip2 = format(CR_DODGE_TOOLTIP, GetCombatRating(CR_DODGE), GetCombatRatingBonus(CR_DODGE));
 	statFrame:Show();
 end
 
@@ -390,7 +378,7 @@ function CSC_PaperDollFrame_SetParry(statFrame, unit)
 	local chance = GetParryChance();
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_PARRY, chance, true, chance);
 	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, PARRY_CHANCE).." "..string.format("%.2F", chance).."%"..FONT_COLOR_CODE_CLOSE;
-	statFrame.tooltip2 = format(CR_PARRY_TOOLTIP, GetCombatRating(CR_PARRY), GetCombatRatingBonus(CR_PARRY));
+	--statFrame.tooltip2 = format(CR_PARRY_TOOLTIP, GetCombatRating(CR_PARRY), GetCombatRatingBonus(CR_PARRY));
 	statFrame:Show();
 end
 
@@ -409,17 +397,20 @@ function CSC_PaperDollFrame_SetBlock(statFrame, unit)
 	local chance = GetBlockChance();
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_BLOCK, chance, true, chance);
 	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, BLOCK_CHANCE).." "..string.format("%.2F", chance).."%"..FONT_COLOR_CODE_CLOSE;
-
+	
+	--[[
 	local shieldBlockArmor = GetShieldBlock();
 	local blockArmorReduction = CSC_PaperDollFrame_GetArmorReduction(shieldBlockArmor, UnitEffectiveLevel(unit));
 	local blockArmorReductionAgainstTarget = CSC_PaperDollFrame_GetArmorReductionAgainstTarget(shieldBlockArmor);
 
 	statFrame.tooltip2 = CR_BLOCK_TOOLTIP:format(blockArmorReduction);
 	if (blockArmorReductionAgainstTarget) then
-		statFrame.tooltip3 = format(STAT_BLOCK_TARGET_TOOLTIP, blockArmorReductionAgainstTarget);
+		--statFrame.tooltip3 = format(STAT_BLOCK_TARGET_TOOLTIP, blockArmorReductionAgainstTarget);
 	else
 		statFrame.tooltip3 = nil;
 	end
+	--]]
+
 	statFrame:Show();
 end
 
@@ -440,6 +431,7 @@ end
 
 -- SPELL --
 function CSC_PaperDollFrame_SetSpellPower(statFrame, unit)
+	local MAX_SPELL_SCHOOLS = 7;
 	local minModifier = 0;
 
 	local holySchool = 2;
