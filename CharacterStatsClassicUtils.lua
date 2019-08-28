@@ -350,7 +350,7 @@ end
 
 function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 	local base, modifier = UnitDefense(unit);
-	
+
 	local posBuff = 0;
 	local negBuff = 0;
 	if ( modifier > 0 ) then

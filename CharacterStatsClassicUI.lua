@@ -64,6 +64,8 @@ function UIConfig:InitializeStatsFrames(leftParentFrame, rightParentFrame)
 end
 
 function UIConfig:SetCharacterStats(statsTable, category)
+    --local characterFrameTab = PanelTemplates_GetSelectedTab(CharacterFrame);
+    --print(characterFrameTab);
     CSC_ResetStatFrames(statsTable);
 
     if category == "Base Stats" then
@@ -168,6 +170,41 @@ function UIConfig:SetupDropdown()
     UIDropDownMenu_SetSelectedID(CSC_UIFrame.CharacterStatsPanel.rightStatsDropDown, UISettingsCharacter.selectedRightStatsCategory);
     UIDropDownMenu_SetWidth(CSC_UIFrame.CharacterStatsPanel.rightStatsDropDown, 99);
     UIDropDownMenu_JustifyText(CSC_UIFrame.CharacterStatsPanel.rightStatsDropDown, "LEFT");
+end
+
+-- Extend the functionality of the default CharacterFrameTab
+function ToggleCharacter(tab, onlyShow)
+    if ( tab == "PaperDollFrame") then
+        CSC_UIFrame.CharacterStatsPanel:Show();
+    else
+        CSC_UIFrame.CharacterStatsPanel:Hide();
+    end
+
+	if ( tab == "PetPaperDollFrame" and not HasPetUI() and not PetPaperDollFrame:IsVisible() ) then
+		return;
+	end
+	if ( tab == "HonorFrame" and not HonorSystemEnabled() and not HonorFrame:IsVisible() ) then
+		return;
+	end
+	local subFrame = _G[tab];
+	if ( subFrame ) then
+		if (not subFrame.hidden) then
+			PanelTemplates_SetTab(CharacterFrame, subFrame:GetID());
+			if ( CharacterFrame:IsShown() ) then
+				if ( subFrame:IsShown() ) then
+					if ( not onlyShow ) then
+						HideUIPanel(CharacterFrame);
+					end
+				else
+					PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
+					CharacterFrame_ShowSubFrame(tab);
+				end
+			else
+				CharacterFrame_ShowSubFrame(tab);
+				ShowUIPanel(CharacterFrame);
+			end
+		end
+    end
 end
 
 -- Serializing the DB
