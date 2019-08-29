@@ -304,6 +304,19 @@ function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
 	statFrame:Show();
 end
 
+function CSC_PaperDollFrame_SetSpellHitChance(statFrame, unit)
+	local hitChance = GetSpellHitModifier();
+	
+	if not hitChance then
+		hitChance = 0;
+	end
+
+	local hitChanceText = hitChance;
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, "Spell Hit", hitChanceText, true, hitChance);
+	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE.."Chance to hit enemies with spells at your level"..FONT_COLOR_CODE_CLOSE;
+	statFrame:Show();
+end
+
 function CSC_PaperDollFrame_SetAttackSpeed(statFrame, unit)
 	local speed, offhandSpeed = UnitAttackSpeed(unit);
 
@@ -312,11 +325,20 @@ function CSC_PaperDollFrame_SetAttackSpeed(statFrame, unit)
 		offhandSpeed = format("%.2F", offhandSpeed);
 	end
 	if ( offhandSpeed ) then
-		displaySpeed =  BreakUpLargeNumbers(displaySpeed).." / ".. offhandSpeed;
+		displaySpeed =  displaySpeed.." / ".. offhandSpeed;
 	else
-		displaySpeed =  BreakUpLargeNumbers(displaySpeed);
+		displaySpeed =  displaySpeed;
 	end
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, WEAPON_SPEED, displaySpeed, false, speed);
+	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, ATTACK_SPEED).." "..displaySpeed..FONT_COLOR_CODE_CLOSE;
+	statFrame:Show();
+end
+
+function CSC_PaperDollFrame_SetRangedAttackSpeed(statFrame, unit)
+	local attackSpeed, minDamage, maxDamage, bonusPos, bonusNeg, percent = UnitRangedDamage(unit);
+	local displaySpeed = format("%.2F", attackSpeed);
+
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, WEAPON_SPEED, displaySpeed, false, attackSpeed);
 	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, ATTACK_SPEED).." "..displaySpeed..FONT_COLOR_CODE_CLOSE;
 	statFrame:Show();
 end
@@ -325,7 +347,7 @@ end
 function CSC_PaperDollFrame_SetArmor(statFrame, unit)
 
 	local base, effectiveArmor, armor, posBuff, negBuff = UnitArmor(unit);
-	negBuff = 0; -- Remove for Classic
+	--negBuff = 0; -- Remove for Classic
 
 	if (unit ~= "player") then
 		--[[ In 1.12.0, UnitArmor didn't report positive / negative buffs for units that weren't the active player.

@@ -89,14 +89,16 @@ function UIConfig:SetCharacterStats(statsTable, category)
     elseif category == "Ranged" then
         CSC_PaperDollFrame_SetDamage(statsTable[1], "player", category);
         CSC_PaperDollFrame_SetRangedAttackPower(statsTable[2], "player");
-        CSC_PaperDollFrame_SetAttackSpeed(statsTable[3], "player");
+        CSC_PaperDollFrame_SetRangedAttackSpeed(statsTable[3], "player");
         CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
+        CSC_PaperDollFrame_SetHitChance(statsTable[5], "player");
     elseif category == "Spell" then
         -- bonus dmg, bonus healing, crit chance, mana regen
         CSC_PaperDollFrame_SetSpellPower(statsTable[1], "player");
         CSC_PaperDollFrame_SetHealing(statsTable[2], "player");
         CSC_PaperDollFrame_SetManaRegen(statsTable[3], "player");
         CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
+        CSC_PaperDollFrame_SetSpellHitChance(statsTable[5], "player");
     end
 end
 
