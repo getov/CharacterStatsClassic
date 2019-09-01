@@ -71,7 +71,7 @@ function CSC_PaperDollFrame_SetPrimaryStats(statFrames, unit)
 		"AGILITY",
 		"STAMINA",
 		"INTELLECT",
-		"SPIRIT", -- fix for Classic
+		"SPIRIT",
 	}
 
 	-- Fix for classic (NUM_STATS instead of NUM_STATS-1)
@@ -133,7 +133,7 @@ end
 -- DAMAGE --
 function CSC_PaperDollFrame_SetDamage(statFrame, unit, category)
 
-    statFrame:SetScript("OnEnter", CharacterDamageFrame_OnEnter)
+    statFrame:SetScript("OnEnter", CSC_CharacterDamageFrame_OnEnter)
 	statFrame:SetScript("OnLeave", function()
 		GameTooltip:Hide()
     end)
@@ -200,7 +200,10 @@ function CSC_PaperDollFrame_SetDamage(statFrame, unit, category)
     statFrame.damage = damageTooltip;
 	statFrame.attackSpeed = speed;
     statFrame.dps = damagePerSecond;
-    --statFrame.unit = unit; -- not in classic
+	
+	local mainHandAttackBase, mainHandAttackMod = UnitAttackBothHands(unit);
+	local attackWithModifier = mainHandAttackBase + mainHandAttackMod;
+	statFrame.melleAttack = attackWithModifier;
 
     -- If there's an offhand speed then add the offhand info to the tooltip
 	if ( offhandSpeed and category == "Melee") then
@@ -229,7 +232,32 @@ function CSC_PaperDollFrame_SetDamage(statFrame, unit, category)
 		statFrame.offhandAttackSpeed = nil;
     end
 
-    statFrame:Show();
+	statFrame:Show();
+end
+
+-- Note: while this function was historically named "BothHands",
+-- it looks like it only ever displayed attack rating for the main hand.
+function CSC_PaperDollFrame_SetAttackBothHands(statFrame, unit)
+
+	local mainHandAttackBase, mainHandAttackMod = UnitAttackBothHands(unit);
+	local attackWithModifier = mainHandAttackBase + mainHandAttackMod;
+	local attackText;
+
+	if( mainHandAttackMod == 0 ) then
+		attackText = mainHandAttackBase;
+	else
+		local color = RED_FONT_COLOR_CODE;
+		if( mainHandAttackMod > 0 ) then
+			color = GREEN_FONT_COLOR_CODE;
+		end
+		attackText = color..attackWithModifier..FONT_COLOR_CODE_CLOSE;
+	end
+
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, DAMAGE, attackText, false, attackWithModifier);
+
+	statFrame.tooltip = ATTACK_TOOLTIP;
+	statFrame.tooltip2 = ATTACK_TOOLTIP_SUBTEXT;
+	statFrame:Show();
 end
 
 function CSC_PaperDollFrame_SetMeleeAttackPower(statFrame, unit)
@@ -291,6 +319,25 @@ function CSC_PaperDollFrame_SetCritChance(statFrame, unit, category)
     statFrame:Show();
 end
 
+function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
+
+	statFrame:SetScript("OnEnter", CSC_CharacterSpellCritFrame_OnEnter)
+	statFrame:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+    end)
+	
+    local critChance = GetSpellCritChance();
+
+    CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, critChance, true, critChance);
+	statFrame.holyCrit = GetSpellCritChance(2);
+	statFrame.fireCrit = GetSpellCritChance(3);
+	statFrame.natureCrit = GetSpellCritChance(4);
+	statFrame.frostCrit = GetSpellCritChance(5);
+	statFrame.shadowCrit = GetSpellCritChance(6);
+	statFrame.arcaneCrit = GetSpellCritChance(7);
+    statFrame:Show();
+end
+
 function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
 	local hitChance = GetHitModifier(); -- Round ?
 	
@@ -319,6 +366,7 @@ end
 
 function CSC_PaperDollFrame_SetAttackSpeed(statFrame, unit)
 	local speed, offhandSpeed = UnitAttackSpeed(unit);
+	local speedLabel = WEAPON_SPEED;
 
 	local displaySpeed = format("%.2F", speed);
 	if ( offhandSpeed ) then
@@ -326,10 +374,11 @@ function CSC_PaperDollFrame_SetAttackSpeed(statFrame, unit)
 	end
 	if ( offhandSpeed ) then
 		displaySpeed =  displaySpeed.." / ".. offhandSpeed;
+		speedLabel = "Att Speed"; -- overlap fix until I find a better way of ding this
 	else
 		displaySpeed =  displaySpeed;
 	end
-	CSC_PaperDollFrame_SetLabelAndText(statFrame, WEAPON_SPEED, displaySpeed, false, speed);
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, speedLabel, displaySpeed, false, speed);
 	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, ATTACK_SPEED).." "..displaySpeed..FONT_COLOR_CODE_CLOSE;
 	statFrame:Show();
 end
@@ -453,6 +502,12 @@ end
 
 -- SPELL --
 function CSC_PaperDollFrame_SetSpellPower(statFrame, unit)
+
+	statFrame:SetScript("OnEnter", CSC_CharacterSpellDamageFrame_OnEnter)
+	statFrame:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+    end)
+
 	local MAX_SPELL_SCHOOLS = 7;
 	local minModifier = 0;
 
@@ -473,12 +528,12 @@ function CSC_PaperDollFrame_SetSpellPower(statFrame, unit)
 	end
 
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_SPELLPOWER, BreakUpLargeNumbers(minModifier), false, minModifier);
-	statFrame.tooltip = STAT_SPELLPOWER;
-	statFrame.tooltip2 = STAT_SPELLPOWER_TOOLTIP;
-
-	statFrame.minModifier = minModifier;
-	--statFrame.unit = unit;
-	--statFrame.onEnterFunc = CharacterSpellBonusDamage_OnEnter;
+	statFrame.holyDmg = GetSpellBonusDamage(2);
+	statFrame.fireDmg = GetSpellBonusDamage(3);
+	statFrame.natureDmg = GetSpellBonusDamage(4);
+	statFrame.frostDmg = GetSpellBonusDamage(5);
+	statFrame.shadowDmg = GetSpellBonusDamage(6);
+	statFrame.arcaneDmg = GetSpellBonusDamage(7);
 	statFrame:Show();
 end
 
@@ -512,3 +567,50 @@ function CSC_PaperDollFrame_SetHealing(statFrame, unit)
 	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE.."Bonus healing"..FONT_COLOR_CODE_CLOSE;
 	statFrame:Show();
 end
+
+-- OnEnter Tooltip functions
+function CSC_CharacterDamageFrame_OnEnter(self)
+	-- Main hand weapon
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	GameTooltip:SetText(INVTYPE_WEAPONMAINHAND, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine(ATTACK_SPEED_COLON, format("%.2F", self.attackSpeed), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine(DAMAGE_COLON, self.damage, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine(DAMAGE_PER_SECOND, format("%.1F", self.dps), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine(ATTACK_TOOLTIP..":", self.melleAttack, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	-- Check for offhand weapon
+	if ( self.offhandAttackSpeed ) then
+		GameTooltip:AddLine(" "); -- Blank line.
+		GameTooltip:AddLine(INVTYPE_WEAPONOFFHAND, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+		GameTooltip:AddDoubleLine(ATTACK_SPEED_COLON, format("%.2F", self.offhandAttackSpeed), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+		GameTooltip:AddDoubleLine(DAMAGE_COLON, self.offhandDamage, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+		GameTooltip:AddDoubleLine(DAMAGE_PER_SECOND, format("%.1F", self.offhandDps), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	end
+	GameTooltip:Show();
+end
+
+function CSC_CharacterSpellDamageFrame_OnEnter(self)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	GameTooltip:SetText(STAT_SPELLPOWER, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine(STAT_SPELLPOWER_TOOLTIP);
+	GameTooltip:AddLine(" "); -- Blank line.
+	GameTooltip:AddDoubleLine("Holy Damage: ", format("%.2F", self.holyDmg), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine("Fire Damage: ", format("%.2F", self.fireDmg), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine("Frost Damage: ", format("%.2F", self.frostDmg), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine("Arcane Damage: ", format("%.2F", self.arcaneDmg), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine("Shadow Damage: ", format("%.2F", self.shadowDmg), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine("Nature Damage: ", format("%.2F", self.natureDmg), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:Show();
+end
+
+function CSC_CharacterSpellCritFrame_OnEnter(self)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	GameTooltip:SetText(STAT_CRITICAL_STRIKE, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine("Holy Crit: ", format("%.2F", self.holyCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine("Fire Crit: ", format("%.2F", self.fireCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine("Frost Crit: ", format("%.2F", self.frostCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine("Arcane Crit: ", format("%.2F", self.arcaneCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine("Shadow Crit: ", format("%.2F", self.shadowCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine("Nature Crit: ", format("%.2F", self.natureCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:Show();
+end
+-- OnEnter Tooltip functions END

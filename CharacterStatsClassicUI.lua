@@ -47,8 +47,8 @@ function UIConfig:InitializeStatsFrames(leftParentFrame, rightParentFrame)
         local actualOffset = accumulatedOffsetY;
         
         if i == 1 then 
-            actualOffset = 35;
-            accumulatedOffsetY = 35;
+            actualOffset = 32;
+            accumulatedOffsetY = 32;
         end
 
         LeftStatsTable[i] = CreateFrame("Frame", nil, leftParentFrame, "CharacterStatFrameTemplate");
@@ -86,6 +86,7 @@ function UIConfig:SetCharacterStats(statsTable, category)
         CSC_PaperDollFrame_SetAttackSpeed(statsTable[3], "player");
         CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
         CSC_PaperDollFrame_SetHitChance(statsTable[5], "player");
+        --CSC_PaperDollFrame_SetHitChance(statsTable[6], "player");--test
     elseif category == "Ranged" then
         CSC_PaperDollFrame_SetDamage(statsTable[1], "player", category);
         CSC_PaperDollFrame_SetRangedAttackPower(statsTable[2], "player");
@@ -97,7 +98,7 @@ function UIConfig:SetCharacterStats(statsTable, category)
         CSC_PaperDollFrame_SetSpellPower(statsTable[1], "player");
         CSC_PaperDollFrame_SetHealing(statsTable[2], "player");
         CSC_PaperDollFrame_SetManaRegen(statsTable[3], "player");
-        CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
+        CSC_PaperDollFrame_SetSpellCritChance(statsTable[4], "player");
         CSC_PaperDollFrame_SetSpellHitChance(statsTable[5], "player");
     end
 end
@@ -107,7 +108,7 @@ function UIConfig:CreateMenu()
     CharacterAttributesFrame:Hide();
 
     CSC_UIFrame.CharacterStatsPanel = CreateFrame("Frame", nil, CharacterFrame); --CharacterFrameInsetRight
-	CSC_UIFrame.CharacterStatsPanel:SetPoint("LEFT", CharacterFrame, "BOTTOMLEFT", 50, 75);
+	CSC_UIFrame.CharacterStatsPanel:SetPoint("LEFT", CharacterFrame, "BOTTOMLEFT", 50, 75); --85 for 6 stats
 	CSC_UIFrame.CharacterStatsPanel:SetHeight(320);
     CSC_UIFrame.CharacterStatsPanel:SetWidth(200);
 
