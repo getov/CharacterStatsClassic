@@ -509,25 +509,16 @@ function CSC_PaperDollFrame_SetSpellPower(statFrame, unit)
     end)
 
 	local MAX_SPELL_SCHOOLS = 7;
-	local minModifier = 0;
-
 	local holySchool = 2;
+
 	-- Start at 2 to skip physical damage
-	minModifier = GetSpellBonusDamage(holySchool);
-
-	if (statFrame.bonusDamage) then
-		table.wipe(statFrame.bonusDamage);
-	else
-		statFrame.bonusDamage = {};
-	end
-	statFrame.bonusDamage[holySchool] = minModifier;
-	for i=(holySchool+1), MAX_SPELL_SCHOOLS do
+	local maxSpellDmg = GetSpellBonusDamage(holySchool);
+	for i=holySchool, MAX_SPELL_SCHOOLS do
 		local bonusDamage = GetSpellBonusDamage(i);
-		minModifier = min(minModifier, bonusDamage);
-		statFrame.bonusDamage[i] = bonusDamage;
+		maxSpellDmg = max(maxSpellDmg, bonusDamage);
 	end
 
-	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_SPELLPOWER, BreakUpLargeNumbers(minModifier), false, minModifier);
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_SPELLPOWER, BreakUpLargeNumbers(maxSpellDmg), false, maxSpellDmg);
 	statFrame.holyDmg = GetSpellBonusDamage(2);
 	statFrame.fireDmg = GetSpellBonusDamage(3);
 	statFrame.natureDmg = GetSpellBonusDamage(4);
@@ -547,6 +538,7 @@ function CSC_PaperDollFrame_SetManaRegen(statFrame, unit)
 	end
 
 	local base, combat = GetManaRegen();
+	
 	-- All mana regen stats are displayed as mana/5 sec.
 	base = floor(base * 5.0);
 	combat = floor(combat * 5.0);
@@ -592,6 +584,7 @@ function CSC_CharacterSpellDamageFrame_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(STAT_SPELLPOWER, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(STAT_SPELLPOWER_TOOLTIP);
+	GameTooltip:AddLine("Displays the highest type of spell damage");
 	GameTooltip:AddLine(" "); -- Blank line.
 	GameTooltip:AddDoubleLine("Holy Damage: ", format("%.2F", self.holyDmg), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine("Fire Damage: ", format("%.2F", self.fireDmg), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
