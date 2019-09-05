@@ -24,14 +24,19 @@ local function CSC_GetAppropriateDamage(unit, category)
 end
 
 local function CSC_PaperDollFrame_SetLabelAndText(statFrame, label, text, isPercentage, numericValue)
-	if ( statFrame.Label ) then
-        statFrame.Label:SetText(format(STAT_FORMAT, label));
-	end
 	if ( isPercentage ) then
-		text = format("%d%%", numericValue + 0.5);
+		statFrame.Value:SetText(format("%.1F%%", numericValue));
+	else
+		statFrame.Value:SetText(text);
 	end
-	statFrame.Value:SetText(text);
-    statFrame.numericValue = numericValue;
+	statFrame.numericValue = numericValue;
+
+	if ( statFrame.Label ) then
+		statFrame.Label:SetText(format(STAT_FORMAT, label));
+		statFrame.Label:SetWidth(statFrame:GetWidth() - statFrame.Value:GetWidth() - 20);
+		statFrame.Label:SetHeight(statFrame:GetHeight());
+		statFrame.Label:SetJustifyH("LEFT");
+	end
 end
 
 local function CSC_PaperDollFormatStat(name, base, posBuff, negBuff)
