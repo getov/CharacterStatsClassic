@@ -17,11 +17,11 @@ local UIConfig = core.UIConfig;
 local CSC_UIFrame = core.UIConfig;
 
 local statsDropdownList = {
-    "Base Stats",
-    "Melee",
-    "Ranged",
-    "Spell",
-    "Defenses"
+    PLAYERSTAT_BASE_STATS,
+    PLAYERSTAT_MELEE_COMBAT,
+    PLAYERSTAT_RANGED_COMBAT,
+    PLAYERSTAT_SPELL_COMBAT,
+    PLAYERSTAT_DEFENSES
 }
 
 local NUM_STATS_TO_SHOW = 6;
@@ -68,10 +68,10 @@ function UIConfig:SetCharacterStats(statsTable, category)
     --print(characterFrameTab);
     CSC_ResetStatFrames(statsTable);
 
-    if category == "Base Stats" then
+    if category == PLAYERSTAT_BASE_STATS then
         -- str, agility, stamina, intelect, spirit, armor
         CSC_PaperDollFrame_SetPrimaryStats(statsTable, "player");
-    elseif category == "Defenses" then
+    elseif category == PLAYERSTAT_DEFENSES then
         -- armor, defense, dodge, parry, block
         CSC_PaperDollFrame_SetArmor(statsTable[1], "player");
         CSC_PaperDollFrame_SetDefense(statsTable[2], "player");
@@ -79,7 +79,7 @@ function UIConfig:SetCharacterStats(statsTable, category)
         CSC_PaperDollFrame_SetParry(statsTable[4], "player");
         CSC_PaperDollFrame_SetBlock(statsTable[5], "player");
         --CSC_PaperDollFrame_SetStagger(statsTable[6], "player"); Is this useful?
-    elseif category == "Melee" then
+    elseif category == PLAYERSTAT_MELEE_COMBAT then
         -- damage, Att Power, speed, hit raiting, crit chance
         CSC_PaperDollFrame_SetDamage(statsTable[1], "player", category);
         CSC_PaperDollFrame_SetMeleeAttackPower(statsTable[2], "player");
@@ -87,13 +87,13 @@ function UIConfig:SetCharacterStats(statsTable, category)
         CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
         CSC_PaperDollFrame_SetHitChance(statsTable[5], "player");
         --CSC_PaperDollFrame_SetHitChance(statsTable[6], "player");--test
-    elseif category == "Ranged" then
+    elseif category == PLAYERSTAT_RANGED_COMBAT then
         CSC_PaperDollFrame_SetDamage(statsTable[1], "player", category);
         CSC_PaperDollFrame_SetRangedAttackPower(statsTable[2], "player");
         CSC_PaperDollFrame_SetRangedAttackSpeed(statsTable[3], "player");
         CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
         CSC_PaperDollFrame_SetHitChance(statsTable[5], "player");
-    elseif category == "Spell" then
+    elseif category == PLAYERSTAT_SPELL_COMBAT then
         -- bonus dmg, bonus healing, crit chance, mana regen
         CSC_PaperDollFrame_SetSpellPower(statsTable[1], "player");
         CSC_PaperDollFrame_SetHealing(statsTable[2], "player");
