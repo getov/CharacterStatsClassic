@@ -380,7 +380,7 @@ function CSC_PaperDollFrame_SetAttackSpeed(statFrame, unit)
 		displaySpeed =  displaySpeed;
 	end
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, speedLabel, displaySpeed, false, speed);
-	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, ATTACK_SPEED).." "..displaySpeed..FONT_COLOR_CODE_CLOSE;
+	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, ATTACK_SPEED).." "..displaySpeed;
 	statFrame:Show();
 end
 
@@ -389,7 +389,7 @@ function CSC_PaperDollFrame_SetRangedAttackSpeed(statFrame, unit)
 	local displaySpeed = format("%.2F", attackSpeed);
 
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, WEAPON_SPEED, displaySpeed, false, attackSpeed);
-	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, ATTACK_SPEED).." "..displaySpeed..FONT_COLOR_CODE_CLOSE;
+	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, ATTACK_SPEED).." "..displaySpeed;
 	statFrame:Show();
 end
 
@@ -441,7 +441,7 @@ end
 function CSC_PaperDollFrame_SetDodge(statFrame, unit)
 	local chance = GetDodgeChance();
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_DODGE, chance, true, chance);
-	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, DODGE_CHANCE).." "..string.format("%.2F", chance).."%"..FONT_COLOR_CODE_CLOSE;
+	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, DODGE_CHANCE).." "..string.format("%.2F", chance).."%";
 	--statFrame.tooltip2 = format(CR_DODGE_TOOLTIP, GetCombatRating(CR_DODGE), GetCombatRatingBonus(CR_DODGE));
 	statFrame:Show();
 end
@@ -449,7 +449,7 @@ end
 function CSC_PaperDollFrame_SetParry(statFrame, unit)
 	local chance = GetParryChance();
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_PARRY, chance, true, chance);
-	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, PARRY_CHANCE).." "..string.format("%.2F", chance).."%"..FONT_COLOR_CODE_CLOSE;
+	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, PARRY_CHANCE).." "..string.format("%.2F", chance).."%";
 	--statFrame.tooltip2 = format(CR_PARRY_TOOLTIP, GetCombatRating(CR_PARRY), GetCombatRatingBonus(CR_PARRY));
 	statFrame:Show();
 end
@@ -468,7 +468,7 @@ end
 function CSC_PaperDollFrame_SetBlock(statFrame, unit)
 	local chance = GetBlockChance();
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_BLOCK, chance, true, chance);
-	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, BLOCK_CHANCE).." "..string.format("%.2F", chance).."%"..FONT_COLOR_CODE_CLOSE;
+	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, BLOCK_CHANCE).." "..string.format("%.2F", chance).."%";
 	
 	--[[
 	local shieldBlockArmor = GetShieldBlock();
@@ -490,7 +490,7 @@ function CSC_PaperDollFrame_SetStagger(statFrame, unit)
 	local stagger, staggerAgainstTarget = C_PaperDollInfo.GetStaggerPercentage(unit);
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_STAGGER, stagger, true, stagger);
 
-	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAGGER).." "..string.format("%.2F%%",stagger)..FONT_COLOR_CODE_CLOSE;
+	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAGGER).." "..string.format("%.2F%%",stagger);
 	statFrame.tooltip2 = format(STAT_STAGGER_TOOLTIP, stagger);
 	if (staggerAgainstTarget) then
 		statFrame.tooltip3 = format(STAT_STAGGER_TARGET_TOOLTIP, staggerAgainstTarget);
@@ -555,7 +555,7 @@ function CSC_PaperDollFrame_SetManaRegen(statFrame, unit)
 	local combatText = BreakUpLargeNumbers(combat);
 	-- Combat mana regen is most important to the player, so we display it as the main value
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, MANA_REGEN, combatText, false, combat);
-	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE .. format(PAPERDOLLFRAME_TOOLTIP_FORMAT, MANA_REGEN) .. " " .. combatText .. FONT_COLOR_CODE_CLOSE;
+	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, MANA_REGEN) .. " " .. combatText;
 	-- Base (out of combat) regen is displayed only in the subtext of the tooltip
 	statFrame.tooltip2 = format(MANA_REGEN_TOOLTIP, baseText);
 	statFrame:Show();
@@ -565,7 +565,7 @@ function CSC_PaperDollFrame_SetHealing(statFrame, unit)
 	local healing = GetSpellBonusHealing();
 	local healingText = healing;
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_SPELLHEALING, healingText, false, healing);
-	statFrame.tooltip = HIGHLIGHT_FONT_COLOR_CODE..STAT_SPELLHEALING_TOOLTIP..FONT_COLOR_CODE_CLOSE;
+	statFrame.tooltip = STAT_SPELLHEALING_TOOLTIP;
 	statFrame:Show();
 end
 
