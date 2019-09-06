@@ -557,7 +557,8 @@ function CSC_PaperDollFrame_SetHealing(statFrame, unit)
 	local healing = GetSpellBonusHealing();
 	local healingText = healing;
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_SPELLHEALING, healingText, false, healing);
-	statFrame.tooltip = STAT_SPELLHEALING_TOOLTIP;
+	statFrame.tooltip = STAT_SPELLHEALING.." "..healing;
+	statFrame.tooltip2 = STAT_SPELLHEALING_TOOLTIP;
 	statFrame:Show();
 end
 
