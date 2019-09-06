@@ -15,9 +15,9 @@ local function CSC_GetAppropriateDamage(unit, category)
 		return UnitDamage(unit);
     end
 	]]
-	if category == "Melee" then
+	if category == PLAYERSTAT_MELEE_COMBAT then
 		return UnitDamage(unit);
-	elseif category == "Ranged" then
+	elseif category == PLAYERSTAT_RANGED_COMBAT then
 		local attackTime, minDamage, maxDamage, bonusPos, bonusNeg, percent = UnitRangedDamage(unit);
 		return minDamage, maxDamage, nil, nil, 0, 0, percent;
 	end
