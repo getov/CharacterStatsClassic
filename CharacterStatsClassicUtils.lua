@@ -421,17 +421,37 @@ function CSC_PaperDollFrame_SetArmor(statFrame, unit)
 end
 
 function CSC_PaperDollFrame_SetDefense(statFrame, unit)
-	local base, modifier = UnitDefense(unit);
+
+	local numSkills = GetNumSkillLines();
+	local skillIndex = 0;
+
+	for i = 1, numSkills do
+		local skillName = select(1, GetSkillLineInfo(i));
+
+		if (skillName == "Defense") then
+			skillIndex = i;
+			break;
+		end
+	end
+
+	local skillRank, skillModifier;
+	if (skillIndex > 0) then
+		skillRank = select(4, GetSkillLineInfo(skillIndex));
+		skillModifier = select(6, GetSkillLineInfo(skillIndex));
+	else
+		-- Temporal workaround if the "Defense" label above is localization dependent
+		skillRank, skillModifier = UnitDefense(unit); --Not working properly
+	end
 
 	local posBuff = 0;
 	local negBuff = 0;
-	if ( modifier > 0 ) then
-		posBuff = modifier;
-	elseif ( modifier < 0 ) then
-		negBuff = modifier;
+	if ( skillModifier > 0 ) then
+		posBuff = skillModifier;
+	elseif ( skillModifier < 0 ) then
+		negBuff = skillModifier;
 	end
-	local valueText, tooltipText = CSC_PaperDollFormatStat(DEFENSE_COLON, base, posBuff, negBuff);
-	local valueNum = max(0, base + posBuff + negBuff);
+	local valueText, tooltipText = CSC_PaperDollFormatStat(DEFENSE_COLON, skillRank, posBuff, negBuff);
+	local valueNum = max(0, skillRank + posBuff + negBuff);
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, DEFENSE, valueText, false, valueNum);
 	statFrame.tooltip = tooltipText;
 	tooltipText = format(DEFAULT_STATDEFENSE_TOOLTIP, valueNum, 0, valueNum*0.04, valueNum*0.04);
