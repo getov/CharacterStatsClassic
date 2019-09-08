@@ -428,7 +428,7 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 	for i = 1, numSkills do
 		local skillName = select(1, GetSkillLineInfo(i));
 
-		if (skillName == "Defense") then
+		if (skillName == DEFENSE) then
 			skillIndex = i;
 			break;
 		end
