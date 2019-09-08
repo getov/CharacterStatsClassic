@@ -434,7 +434,10 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 	local valueNum = max(0, base + posBuff + negBuff);
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, DEFENSE, valueText, false, valueNum);
 	statFrame.tooltip = tooltipText;
-	statFrame.tooltip2 = DEFENSE_TOOLTIP;
+	tooltipText = format(DEFAULT_STATDEFENSE_TOOLTIP, valueNum, 0, valueNum*0.04, valueNum*0.04);
+	tooltipText = tooltipText:gsub('.-\n', '', 1);
+	tooltipText = tooltipText:gsub('%b()', '');
+	statFrame.tooltip2 = tooltipText;
 	statFrame:Show();
 end
 
