@@ -353,7 +353,7 @@ function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
 	local hitChanceText = hitChance;
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_HIT_CHANCE, hitChanceText, true, hitChance);
 	statFrame.tooltip = STAT_HIT_CHANCE.." "..hitChanceText;
-	statFrame.tooltip2 = format(CR_HIT_MELEE_TOOLTIP, UnitLevel("player"), hitChance);
+	statFrame.tooltip2 = format(CR_HIT_MELEE_TOOLTIP, UnitLevel(unit), hitChance);
 	statFrame:Show();
 end
 
@@ -367,7 +367,7 @@ function CSC_PaperDollFrame_SetSpellHitChance(statFrame, unit)
 	local hitChanceText = hitChance;
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_HIT_CHANCE, hitChanceText, true, hitChance);
 	statFrame.tooltip = STAT_HIT_CHANCE.." "..hitChanceText;
-	statFrame.tooltip2 = format(CR_HIT_SPELL_TOOLTIP, UnitLevel("player"), hitChance);
+	statFrame.tooltip2 = format(CR_HIT_SPELL_TOOLTIP, UnitLevel(unit), hitChance);
 	statFrame:Show();
 end
 
@@ -444,7 +444,7 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 		skillRank = select(4, GetSkillLineInfo(skillIndex));
 		skillModifier = select(6, GetSkillLineInfo(skillIndex));
 	else
-		-- Temporal workaround if the "Defense" label above is localization dependent
+		-- Use this as a backup, just in case something goes wrong
 		skillRank, skillModifier = UnitDefense(unit); --Not working properly
 	end
 
