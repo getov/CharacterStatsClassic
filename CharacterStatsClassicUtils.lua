@@ -7,20 +7,35 @@ local function DebugBreakPrint()
 end
 
 local function CSC_GetAppropriateDamage(unit, category)
-    --[[ TODO: Find a way to check if this is a ranged unit
-    if IsRangedWeapon() then
-		local attackTime, minDamage, maxDamage, bonusPos, bonusNeg, percent = UnitRangedDamage(unit);
-		return minDamage, maxDamage, nil, nil, 0, 0, percent;
-	else
-		return UnitDamage(unit);
-    end
-	]]
 	if category == PLAYERSTAT_MELEE_COMBAT then
 		return UnitDamage(unit);
 	elseif category == PLAYERSTAT_RANGED_COMBAT then
 		local attackTime, minDamage, maxDamage, bonusPos, bonusNeg, percent = UnitRangedDamage(unit);
-		return minDamage, maxDamage, nil, nil, 0, 0, percent;
+		return minDamage, maxDamage, nil, nil, bonusPos, bonusNeg, percent;
 	end
+end
+
+local function CSC_GetAppropriateAttackSpeed(unit, category)
+	if category == PLAYERSTAT_MELEE_COMBAT then
+		return UnitAttackSpeed(unit);
+	elseif category == PLAYERSTAT_RANGED_COMBAT then
+		local attackSpeed = select(1, UnitRangedDamage(unit))
+		return attackSpeed, 0;
+	end
+end
+
+local function CSC_GetAppropriateAttackRaiting(unit, category)
+	local attackBase = 0;
+	local attackModifier = 0;
+
+	if category == PLAYERSTAT_MELEE_COMBAT then
+		attackBase, attackModifier = UnitAttackBothHands(unit);
+	elseif category == PLAYERSTAT_RANGED_COMBAT then
+		attackBase, attackModifier = UnitRangedAttack(unit)
+	end
+
+	local attackWithModifier = attackBase + attackModifier;
+	return attackWithModifier;
 end
 
 local function CSC_PaperDollFrame_SetLabelAndText(statFrame, label, text, isPercentage, numericValue)
@@ -138,12 +153,18 @@ end
 -- DAMAGE --
 function CSC_PaperDollFrame_SetDamage(statFrame, unit, category)
 
+	if (category == PLAYERSTAT_RANGED_COMBAT) and not IsRangedWeapon() then
+		CSC_PaperDollFrame_SetLabelAndText(statFrame, DAMAGE, NOT_APPLICABLE, false, 0);
+		statFrame:Show();
+		return;
+	end
+
     statFrame:SetScript("OnEnter", CSC_CharacterDamageFrame_OnEnter)
 	statFrame:SetScript("OnLeave", function()
 		GameTooltip:Hide()
     end)
 
-    local speed, offhandSpeed = UnitAttackSpeed(unit);
+    local speed, offhandSpeed = CSC_GetAppropriateAttackSpeed(unit, category);
     local minDamage, maxDamage, minOffHandDamage, maxOffHandDamage, physicalBonusPos, physicalBonusNeg, percent = CSC_GetAppropriateDamage(unit, category);
     
     local displayMin = max(floor(minDamage),1);
@@ -205,10 +226,12 @@ function CSC_PaperDollFrame_SetDamage(statFrame, unit, category)
     statFrame.damage = damageTooltip;
 	statFrame.attackSpeed = speed;
     statFrame.dps = damagePerSecond;
-	
-	local mainHandAttackBase, mainHandAttackMod = UnitAttackBothHands(unit);
-	local attackWithModifier = mainHandAttackBase + mainHandAttackMod;
-	statFrame.melleAttack = attackWithModifier;
+	statFrame.attackRating = CSC_GetAppropriateAttackRaiting(unit, category);
+	statFrame.TooltipMainTxt = INVTYPE_WEAPONMAINHAND;
+
+	if (category == PLAYERSTAT_RANGED_COMBAT) and IsRangedWeapon() then
+		statFrame.TooltipMainTxt = INVTYPE_RANGED;
+	end
 
     -- If there's an offhand speed then add the offhand info to the tooltip
 	if ( offhandSpeed and category == PLAYERSTAT_MELEE_COMBAT) then
@@ -278,16 +301,13 @@ function CSC_PaperDollFrame_SetMeleeAttackPower(statFrame, unit)
 end
 
 function CSC_PaperDollFrame_SetRangedAttackPower(statFrame, unit)
-    
-	--[[ If no ranged attack then set to n/a
-	if ( PaperDollFrame.noRanged ) then
-		print("NO RANGED");
+	
+	if not IsRangedWeapon() then
 		CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_ATTACK_POWER, NOT_APPLICABLE, false, 0);
-		statFrame.tooltip = nil;
 		statFrame:Show();
 		return;
 	end
-	--]]
+
 	if ( HasWandEquipped() ) then
 		CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_ATTACK_POWER, NOT_APPLICABLE, false, 0);
 		statFrame.tooltip = nil;
@@ -306,21 +326,21 @@ end
 
 -- SECONDARY STATS --
 function CSC_PaperDollFrame_SetCritChance(statFrame, unit, category)
-    -- TODO: Maybe implement it differently (have to test when the game launches)
-    -- Warning: For some reason these return the same value on retail.... will have to check on Classic
     local critChance;
 
     if category == PLAYERSTAT_MELEE_COMBAT then
         critChance = GetCritChance();
-    elseif category == PLAYERSTAT_RANGED_COMBAT then
+	elseif category == PLAYERSTAT_RANGED_COMBAT then
+		if not IsRangedWeapon() then
+			CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, NOT_APPLICABLE, false, 0);
+			statFrame:Show();
+			return;
+		end
         critChance = GetRangedCritChance();
-    elseif category == PLAYERSTAT_SPELL_COMBAT then
-        critChance = GetSpellCritChance();
     end
 
     CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, critChance, true, critChance);
 	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_CRITICAL_STRIKE).." "..format("%.2F%%", critChance);
-	statFrame.tooltip2 = "";
     statFrame:Show();
 end
 
@@ -331,9 +351,17 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 		GameTooltip:Hide()
     end)
 	
-    local critChance = GetSpellCritChance();
+	local MAX_SPELL_SCHOOLS = 7;
+	local holySchool = 2;
 
-    CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, critChance, true, critChance);
+	-- Start at 2 to skip physical damage
+	local maxSpellCrit = GetSpellCritChance(holySchool);
+	for i=holySchool, MAX_SPELL_SCHOOLS do
+		local bonusCrit = GetSpellCritChance(i);
+		maxSpellCrit = max(maxSpellCrit, bonusCrit);
+	end
+
+    CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, maxSpellCrit, true, maxSpellCrit);
 	statFrame.holyCrit = GetSpellCritChance(2);
 	statFrame.fireCrit = GetSpellCritChance(3);
 	statFrame.natureCrit = GetSpellCritChance(4);
@@ -344,7 +372,7 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 end
 
 function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
-	local hitChance = GetHitModifier(); -- Round ?
+	local hitChance = GetHitModifier();
 	
 	if not hitChance then
 		hitChance = 0;
@@ -354,6 +382,27 @@ function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_HIT_CHANCE, hitChanceText, true, hitChance);
 	statFrame.tooltip = STAT_HIT_CHANCE.." "..hitChanceText;
 	statFrame.tooltip2 = format(CR_HIT_MELEE_TOOLTIP, UnitLevel(unit), hitChance);
+	statFrame:Show();
+end
+
+function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
+	
+	if not IsRangedWeapon() then
+		CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_HIT_CHANCE, NOT_APPLICABLE, false, 0);
+		statFrame:Show();
+		return;
+	end
+	
+	local hitChance = GetHitModifier();
+	
+	if not hitChance then
+		hitChance = 0;
+	end
+
+	local hitChanceText = hitChance;
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_HIT_CHANCE, hitChanceText, true, hitChance);
+	statFrame.tooltip = STAT_HIT_CHANCE.." "..hitChanceText;
+	statFrame.tooltip2 = format(CR_HIT_RANGED_TOOLTIP, UnitLevel(unit), hitChance);
 	statFrame:Show();
 end
 
@@ -390,6 +439,13 @@ function CSC_PaperDollFrame_SetAttackSpeed(statFrame, unit)
 end
 
 function CSC_PaperDollFrame_SetRangedAttackSpeed(statFrame, unit)
+	
+	if not IsRangedWeapon() then
+		CSC_PaperDollFrame_SetLabelAndText(statFrame, WEAPON_SPEED, NOT_APPLICABLE, false, 0);
+		statFrame:Show();
+		return;
+	end
+
 	local attackSpeed, minDamage, maxDamage, bonusPos, bonusNeg, percent = UnitRangedDamage(unit);
 	local displaySpeed = format("%.2F", attackSpeed);
 
@@ -594,11 +650,11 @@ end
 function CSC_CharacterDamageFrame_OnEnter(self)
 	-- Main hand weapon
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-	GameTooltip:SetText(INVTYPE_WEAPONMAINHAND, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:SetText(self.TooltipMainTxt, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(ATTACK_SPEED_COLON, format("%.2F", self.attackSpeed), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(DAMAGE_COLON, self.damage, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(DAMAGE_PER_SECOND, format("%.1F", self.dps), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-	GameTooltip:AddDoubleLine(ATTACK_TOOLTIP..":", self.melleAttack, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine(ATTACK_TOOLTIP..":", self.attackRating, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	-- Check for offhand weapon
 	if ( self.offhandAttackSpeed ) then
 		GameTooltip:AddLine(" "); -- Blank line.
@@ -614,7 +670,6 @@ function CSC_CharacterSpellDamageFrame_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(STAT_SPELLPOWER, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(STAT_SPELLPOWER_TOOLTIP);
-	GameTooltip:AddLine("Displays the highest type of spell damage");
 	GameTooltip:AddLine(" "); -- Blank line.
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL1_CAP.." "..DAMAGE..": ", format("%.2F", self.holyDmg), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL2_CAP.." "..DAMAGE..": ", format("%.2F", self.fireDmg), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
@@ -628,6 +683,7 @@ end
 function CSC_CharacterSpellCritFrame_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(STAT_CRITICAL_STRIKE, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddLine(" "); -- Blank line.
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL1_CAP.." "..CRIT_ABBR..": ", format("%.2F", self.holyCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL2_CAP.." "..CRIT_ABBR..": ", format("%.2F", self.fireCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL4_CAP.." "..CRIT_ABBR..": ", format("%.2F", self.frostCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);

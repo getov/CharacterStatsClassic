@@ -64,12 +64,11 @@ function UIConfig:InitializeStatsFrames(leftParentFrame, rightParentFrame)
 end
 
 function UIConfig:SetCharacterStats(statsTable, category)
-    --local characterFrameTab = PanelTemplates_GetSelectedTab(CharacterFrame);
-    --print(characterFrameTab);
+
     CSC_ResetStatFrames(statsTable);
 
     if category == PLAYERSTAT_BASE_STATS then
-        -- str, agility, stamina, intelect, spirit, armor
+        -- str, agility, stamina, intelect, spirit
         CSC_PaperDollFrame_SetPrimaryStats(statsTable, "player");
     elseif category == PLAYERSTAT_DEFENSES then
         -- armor, defense, dodge, parry, block
@@ -78,7 +77,6 @@ function UIConfig:SetCharacterStats(statsTable, category)
         CSC_PaperDollFrame_SetDodge(statsTable[3], "player");
         CSC_PaperDollFrame_SetParry(statsTable[4], "player");
         CSC_PaperDollFrame_SetBlock(statsTable[5], "player");
-        --CSC_PaperDollFrame_SetStagger(statsTable[6], "player"); Is this useful?
     elseif category == PLAYERSTAT_MELEE_COMBAT then
         -- damage, Att Power, speed, hit raiting, crit chance
         CSC_PaperDollFrame_SetDamage(statsTable[1], "player", category);
@@ -86,15 +84,14 @@ function UIConfig:SetCharacterStats(statsTable, category)
         CSC_PaperDollFrame_SetAttackSpeed(statsTable[3], "player");
         CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
         CSC_PaperDollFrame_SetHitChance(statsTable[5], "player");
-        --CSC_PaperDollFrame_SetHitChance(statsTable[6], "player");--test
     elseif category == PLAYERSTAT_RANGED_COMBAT then
         CSC_PaperDollFrame_SetDamage(statsTable[1], "player", category);
         CSC_PaperDollFrame_SetRangedAttackPower(statsTable[2], "player");
         CSC_PaperDollFrame_SetRangedAttackSpeed(statsTable[3], "player");
         CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
-        CSC_PaperDollFrame_SetHitChance(statsTable[5], "player");
+        CSC_PaperDollFrame_SetRangedHitChance(statsTable[5], "player");
     elseif category == PLAYERSTAT_SPELL_COMBAT then
-        -- bonus dmg, bonus healing, crit chance, mana regen
+        -- bonus dmg, bonus healing, crit chance, mana regen, hit
         CSC_PaperDollFrame_SetSpellPower(statsTable[1], "player");
         CSC_PaperDollFrame_SetHealing(statsTable[2], "player");
         CSC_PaperDollFrame_SetManaRegen(statsTable[3], "player");
