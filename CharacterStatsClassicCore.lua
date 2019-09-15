@@ -19,6 +19,5 @@ characterStatsClassicEventFrame:RegisterEvent("SKILL_LINES_CHANGED");
 
 characterStatsClassicEventFrame:SetScript("OnEvent",
     function(self, event, ...)
-        --print(event);
         core.UIConfig:UpdateStats();
     end)

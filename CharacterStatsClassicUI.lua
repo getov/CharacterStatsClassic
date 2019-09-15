@@ -176,6 +176,7 @@ end
 function ToggleCharacter(tab, onlyShow)
     if ( tab == "PaperDollFrame") then
         CSC_UIFrame.CharacterStatsPanel:Show();
+        CSC_UIFrame:UpdateStats();
     else
         CSC_UIFrame.CharacterStatsPanel:Hide();
     end
