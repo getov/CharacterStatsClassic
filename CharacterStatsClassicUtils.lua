@@ -77,6 +77,8 @@ local function CSC_PaperDollFormatStat(name, base, posBuff, negBuff)
 		-- positive buffs. Otherwise show the number in green
 		if ( negBuff < 0 ) then
 			effective = RED_FONT_COLOR_CODE..effective..FONT_COLOR_CODE_CLOSE;
+		elseif (posBuff > 0) then
+			effective = GREEN_FONT_COLOR_CODE..effective..FONT_COLOR_CODE_CLOSE;
 		end
 	end
     
@@ -181,7 +183,7 @@ function CSC_PaperDollFrame_SetDamage(statFrame, unit, category)
     
     local colorPos = "|cff20ff20";
     local colorNeg = "|cffff2020";
-    
+	
     -- epsilon check
 	if ( totalBonus < 0.1 and totalBonus > -0.1 ) then
 		totalBonus = 0.0;
