@@ -330,15 +330,20 @@ end
 function CSC_PaperDollFrame_SetCritChance(statFrame, unit, category)
     local critChance;
 
-    if category == PLAYERSTAT_MELEE_COMBAT then
-        critChance = GetCritChance();
+	if category == PLAYERSTAT_MELEE_COMBAT then
+		local mainBase, mainMod, offBase, offMod = UnitAttackBothHands("player");
+        critChance = mainMod * 0.04 + GetCritChance();
 	elseif category == PLAYERSTAT_RANGED_COMBAT then
 		if not IsRangedWeapon() then
 			CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, NOT_APPLICABLE, false, 0);
 			statFrame:Show();
 			return;
 		end
-        critChance = GetRangedCritChance();
+		local base, modifier = UnitRangedAttack("player");
+		critChance = 0.04 * modifier + GetRangedCritChance();
+		 
+
+		
     end
 
     CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, critChance, true, critChance);
@@ -374,8 +379,11 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 end
 
 function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
-	local hitChance = GetHitModifier();
+	local mainBase, mainMod, offBase, offMod = UnitAttackBothHands("player");
+	local effective = mainMod * 0.04;
+	local hitChance = effective + GetHitModifier();
 	
+
 	if not hitChance then
 		hitChance = 0;
 	end
@@ -394,8 +402,10 @@ function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
 		statFrame:Show();
 		return;
 	end
+	local base, modifier = UnitRangedAttack("player"); 
+	local effective = modifier * 0.24;
 	
-	local hitChance = GetHitModifier();
+	local hitChance = effective + GetHitModifier();
 	
 	if not hitChance then
 		hitChance = 0;
