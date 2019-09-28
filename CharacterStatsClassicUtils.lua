@@ -426,7 +426,6 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 		maxSpellCrit = max(maxSpellCrit, bonusCrit);
 	end
 
-    CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, maxSpellCrit, true, maxSpellCrit);
 	statFrame.holyCrit = GetSpellCritChance(2);
 	statFrame.fireCrit = GetSpellCritChance(3);
 	statFrame.natureCrit = GetSpellCritChance(4);
@@ -468,6 +467,8 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 			maxSpellCrit = max(maxSpellCrit, statFrame.holyCrit);
 		end
 	end
+
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, maxSpellCrit, true, maxSpellCrit);
 
     statFrame:Show();
 end
