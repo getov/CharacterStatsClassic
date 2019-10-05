@@ -85,67 +85,6 @@ local function CSC_PaperDollFormatStat(name, base, posBuff, negBuff)
     
     return effective, text;
 end
-
--- returns additional crit % stats from Arcane instability and Critical Mass if any
-local function CSC_GetMageCritStatsFromTalents()
-
-	local arcaneInstabilityCrit = 0;
-	local criticalMassCrit = 0;
-
-	-- Arcane Instability (1, 2, 3)%
-	local arcaneInstabilityTable = { 1, 2, 3 };
-	local spellRank = select(5, GetTalentInfo(1, 15));
-	if (spellRank > 0) and (spellRank <= 3) then
-		arcaneInstabilityCrit = arcaneInstabilityTable[spellRank];
-	end
-
-	-- Critical Mass (2, 4, 6)%
-	local criticalMassTable = { 2, 4, 6 };
-	spellRank = select(5, GetTalentInfo(2, 13));
-	if (spellRank > 0) and (spellRank <= 3) then
-		criticalMassCrit = criticalMassTable[spellRank];
-	end
-
-	return arcaneInstabilityCrit, criticalMassCrit;
-end
-
--- returns the combined crit stats from Holy Specialization and Force of Will
-local function CSC_GetPriestCritStatsFromTalents()
-	
-	local holySpecializationCrit = 0;
-	local forceOfWillCrit = 0;
-
-	local critTable = { 1, 2, 3, 4, 5 };
-	-- Holy Specialization (1, 2, 3, 4, 5)%
-	local spellRank = select(5, GetTalentInfo(2, 3));
-	if (spellRank > 0) and (spellRank <= 5) then
-		holySpecializationCrit = critTable[spellRank];
-	end
-
-	-- Force of Will (1, 2, 3, 4, 5)%
-	spellRank = select(5, GetTalentInfo(1, 14));
-	if (spellRank > 0) and (spellRank <= 5) then
-		forceOfWillCrit = critTable[spellRank];
-	end
-
-	local critCombined = holySpecializationCrit + forceOfWillCrit;
-	return critCombined;
-end
-
--- returns the crit bonus from Holy Power
-local function CSC_GetPaladinCritStatsFromTalents()
-
-	local holyPowerCrit = 0;
-	local critTable = { 1, 2, 3, 4, 5 };
-
-	-- Holy Power (1, 2, 3, 4, 5)%
-	local spellRank = select(5, GetTalentInfo(1, 13));
-	if (spellRank > 0) and (spellRank <= 5) then
-		holyPowerCrit = critTable[spellRank];
-	end
-
-	return holyPowerCrit;
-end
 -- GENERAL UTIL FUNCTIONS END --
 
 -- PRIMARY STATS --
@@ -604,6 +543,12 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 	else
 		-- Use this as a backup, just in case something goes wrong
 		skillRank, skillModifier = UnitDefense(unit); --Not working properly
+	end
+
+	-- add defense from talents to the base def (still not sure if I want to add it to the base or to the modifier)
+	local defenseFromTalents = CSC_GetDefenseFromTalents(unit);
+	if (defenseFromTalents > 0) then
+		skillRank = skillRank + defenseFromTalents;
 	end
 
 	local posBuff = 0;
