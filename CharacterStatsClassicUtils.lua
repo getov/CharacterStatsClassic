@@ -526,13 +526,19 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 
 	local numSkills = GetNumSkillLines();
 	local skillIndex = 0;
-
+	local x = 0;
+	local englishClass = select(2, UnitClass("player"));
+	
 	for i = 1, numSkills do
 		local skillName = select(1, GetSkillLineInfo(i));
 
 		if (skillName == DEFENSE) then
-			skillIndex = i;
-			break;
+			if ((englishClass == 'WARRIOR') and (x == 0)) then
+				x = 1;
+			else
+				skillIndex = i;
+				break;
+			end;
 		end
 	end
 
