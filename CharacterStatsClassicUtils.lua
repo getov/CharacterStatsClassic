@@ -92,11 +92,12 @@ local function CSC_GetMP5FromGear(unit)
 		local itemLink = GetInventoryItemLink(unit, i);
 		if itemLink then
 			local stats = GetItemStats(itemLink);
-
-			-- For some reason this returns (mp5 - 1) so I have to add 1 to the result
-			local statMP5 = stats["ITEM_MOD_POWER_REGEN0_SHORT"];
-			if (statMP5) then
-				mp5 = mp5 + statMP5 + 1;
+			if stats then
+				-- For some reason this returns (mp5 - 1) so I have to add 1 to the result
+				local statMP5 = stats["ITEM_MOD_POWER_REGEN0_SHORT"];
+				if (statMP5) then
+					mp5 = mp5 + statMP5 + 1;
+				end
 			end
 		end
 	end
