@@ -85,6 +85,24 @@ local function CSC_PaperDollFormatStat(name, base, posBuff, negBuff)
     
     return effective, text;
 end
+
+local function CSC_GetMP5FromGear(unit)
+	local mp5 = 0;
+	for i=1,18 do
+		local itemLink = GetInventoryItemLink(unit, i);
+		if itemLink then
+			local stats = GetItemStats(itemLink);
+
+			-- For some reason this returns (mp5 - 1) so I have to add 1 to the result
+			local statMP5 = stats["ITEM_MOD_POWER_REGEN0_SHORT"];
+			if (statMP5) then
+				mp5 = mp5 + statMP5 + 1;
+			end
+		end
+	end
+
+	return mp5;
+end
 -- GENERAL UTIL FUNCTIONS END --
 
 -- PRIMARY STATS --
@@ -669,18 +687,25 @@ function CSC_PaperDollFrame_SetManaRegen(statFrame, unit)
 		return;
 	end
 
+	statFrame:SetScript("OnEnter", CSC_CharacterManaRegenFrame_OnEnter)
+	statFrame:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+    end)
+
+	-- There is a bug in GetManaRegen() so I have to manually calculate mp5
 	local base, combat = GetManaRegen();
+	local mp5 = CSC_GetMP5FromGear(unit);
 	
 	-- All mana regen stats are displayed as mana/5 sec.
-	base = floor(base * 5.0);
-	combat = floor(combat * 5.0);
+	base = floor(base * 5.0) + mp5;
+	combat = mp5; --floor(combat * 5.0);
+
 	local baseText = BreakUpLargeNumbers(base);
 	local combatText = BreakUpLargeNumbers(combat);
 	-- Combat mana regen is most important to the player, so we display it as the main value
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, MANA_REGEN, combatText, false, combat);
-	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, MANA_REGEN) .. " " .. combatText;
-	-- Base (out of combat) regen is displayed only in the subtext of the tooltip
-	statFrame.tooltip2 = format(MANA_REGEN_TOOLTIP, baseText);
+	statFrame.mp5Casting = combatText;
+	statFrame.mp5NotCasting = baseText;
 	statFrame:Show();
 end
 
@@ -737,6 +762,16 @@ function CSC_CharacterSpellCritFrame_OnEnter(self)
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL6_CAP.." "..CRIT_ABBR..": ", format("%.2F", self.arcaneCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL5_CAP.." "..CRIT_ABBR..": ", format("%.2F", self.shadowCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL3_CAP.." "..CRIT_ABBR..": ", format("%.2F", self.natureCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:Show();
+end
+
+function CSC_CharacterManaRegenFrame_OnEnter(self)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	GameTooltip:SetText(MANA_REGEN_TOOLTIP, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine("!!! Currently detects MP5 from gear only !!!", "", 1, 0, 0);
+	GameTooltip:AddLine(" "); -- Blank line.
+	GameTooltip:AddDoubleLine(MANA_REGEN.." (While Casting):", self.mp5Casting);
+	GameTooltip:AddDoubleLine(MANA_REGEN.." (While Not Casting):", self.mp5NotCasting);
 	GameTooltip:Show();
 end
 -- OnEnter Tooltip functions END

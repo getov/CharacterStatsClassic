@@ -112,8 +112,7 @@ function UIConfig:CreateMenu()
     UIConfig:SetupDropdown();
 
     UIConfig:InitializeStatsFrames(CSC_UIFrame.CharacterStatsPanel.leftStatsDropDown, CSC_UIFrame.CharacterStatsPanel.rightStatsDropDown);
-    UIConfig:SetCharacterStats(LeftStatsTable, statsDropdownList[UISettingsCharacter.selectedLeftStatsCategory]);
-    UIConfig:SetCharacterStats(RightStatsTable, statsDropdownList[UISettingsCharacter.selectedRightStatsCategory]);
+    UIConfig:UpdateStats();
 end
 
 function UIConfig:UpdateStats()

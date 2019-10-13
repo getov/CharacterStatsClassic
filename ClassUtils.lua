@@ -84,11 +84,11 @@ local function CSC_GetWarriorDefenseFromTalents()
     local defense = 0;
     local defenseTable = { 2, 4, 6, 8, 10 };
 
-     -- Anticipation (2, 4, 6, 8, 10)%
-     local spellRank = select(5, GetTalentInfo(3, 2));
-     if (spellRank > 0) and (spellRank <=5) then
-        defense = defenseTable[spellRank];
-    end
+    -- Anticipation (2, 4, 6, 8, 10)%
+    local spellRank = select(5, GetTalentInfo(3, 2));
+    if (spellRank > 0) and (spellRank <=5) then
+		defense = defenseTable[spellRank];
+	end
 
     return defense;
 end
