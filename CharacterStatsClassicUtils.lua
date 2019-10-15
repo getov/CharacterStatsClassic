@@ -417,13 +417,6 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 			-- set the new maximum
 			maxSpellCrit = max(maxSpellCrit, statFrame.holyCrit);
 		end
-	elseif (unitClassLoc == "PALADIN") then
-		local paladinHolyCrit = CSC_GetPaladinCritStatsFromTalents();
-		if (paladinHolyCrit > 0) then
-			statFrame.holyCrit = statFrame.holyCrit + paladinHolyCrit;
-			-- set the new maximum
-			maxSpellCrit = max(maxSpellCrit, statFrame.holyCrit);
-		end
 	end
 
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, maxSpellCrit, true, maxSpellCrit);
@@ -562,12 +555,6 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 	else
 		-- Use this as a backup, just in case something goes wrong
 		skillRank, skillModifier = UnitDefense(unit); --Not working properly
-	end
-
-	-- add defense from talents to the base def (still not sure if I want to add it to the base or to the modifier)
-	local defenseFromTalents = CSC_GetDefenseFromTalents(unit);
-	if (defenseFromTalents > 0) then
-		skillRank = skillRank + defenseFromTalents;
 	end
 
 	local posBuff = 0;
