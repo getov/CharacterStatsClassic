@@ -1,3 +1,4 @@
 -- Custom global localized strings
 
-CSC_WEAPON_SKILLS_HEADER = "Weapon Skills";
+CSC_DEFENSE                 = DEFENSE;
+CSC_WEAPON_SKILLS_HEADER    = "Weapon Skills";

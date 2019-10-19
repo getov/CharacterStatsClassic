@@ -547,7 +547,7 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 		if isHeader ~= nil and isHeader then
 			currentHeader = skillName;
 		else
-			if (currentHeader == CSC_WEAPON_SKILLS_HEADER and skillName == DEFENSE) then
+			if (currentHeader == CSC_WEAPON_SKILLS_HEADER and skillName == CSC_DEFENSE) then
 				skillIndex = i;
 				break;
 			end
@@ -572,7 +572,7 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 	end
 	local valueText, tooltipText = CSC_PaperDollFormatStat(DEFENSE_COLON, skillRank, posBuff, negBuff);
 	local valueNum = max(0, skillRank + posBuff + negBuff);
-	CSC_PaperDollFrame_SetLabelAndText(statFrame, DEFENSE, valueText, false, valueNum);
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, CSC_DEFENSE, valueText, false, valueNum);
 	statFrame.tooltip = tooltipText;
 	tooltipText = format(DEFAULT_STATDEFENSE_TOOLTIP, valueNum, 0, valueNum*0.04, valueNum*0.04);
 	tooltipText = tooltipText:gsub('.-\n', '', 1);
