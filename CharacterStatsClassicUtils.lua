@@ -449,6 +449,36 @@ function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
 	statFrame:Show();
 end
 
+local function CSC_GetHitFromBiznicksAccurascope(unit)
+	CSC_ScanTooltip:ClearLines();
+
+	local hitFromScope = 0;
+	local rangedIndex = 18;
+
+	local hasItem = CSC_ScanTooltip:SetInventoryItem(unit, rangedIndex);
+	if hasItem then
+		local maxLines = CSC_ScanTooltip:NumLines();
+		for line=1, maxLines do
+			local leftText = getglobal(CSC_ScanTooltipPrefix.."TextLeft"..line);
+			if leftText:GetText() then
+				local valueTxt = string.match(leftText:GetText(), "+%d+%% "..CSC_HIT_BIZNICKS_TXT);
+				if valueTxt then
+					valueTxt = string.match(valueTxt, "%d+");
+					if valueTxt then
+						local numValue = tonumber(valueTxt);
+						if numValue then
+							hitFromScope = numValue;
+							break;
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return hitFromScope;
+end
+
 function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
 	
 	if not IsRangedWeapon() then
@@ -461,6 +491,11 @@ function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
 	
 	if not hitChance then
 		hitChance = 0;
+	end
+
+	local hitFromScope = CSC_GetHitFromBiznicksAccurascope(unit);
+	if (hitFromScope > 0) then
+		hitChance = hitChance + hitFromScope;
 	end
 
 	local hitChanceText = hitChance;
@@ -627,6 +662,7 @@ local function CSC_GetBlockValue(unit)
 						local numValue = tonumber(valueTxt);
 						if numValue then
 							blockFromShield = numValue;
+							break;
 						end
 					end
 				end
