@@ -1,16 +1,11 @@
 ## Interface: 11302
 ## Author: Peter Getov
-## Version: 2.6.1
+## Version: 2.7
 ## Title: |cff00aeffCharacterStatsClassic|r
 ## Notes: Advanced Character Stats
 ## DefaultState:  enabled
 ## SavedVariables: CharacterStatsClassicDB
 ## SavedVariablesPerCharacter: CharacterStatsClassicCharacterDB
-
-CharacterStatsClassicUI.lua
-CharacterStatsClassicCore.lua
-CharacterStatsClassicUtils.lua
-ClassUtils.lua
 
 Localization\Localization_en.lua
 Localization\Localization_de.lua
@@ -22,3 +17,8 @@ Localization\Localization_tw.lua
 Localization\Localization_kr.lua
 Localization\Localization_es.lua
 Localization\Localization_br.lua
+
+CharacterStatsClassicUI.lua
+CharacterStatsClassicCore.lua
+CharacterStatsClassicUtils.lua
+ClassUtils.lua
