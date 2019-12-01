@@ -178,8 +178,6 @@ local function CSC_GetBonusHitFromWeaponSkill(unit)
 						local skillDiff = totalWeaponSkill - weaponSkillBorder;
 						bonusHit = skillDiff * hitMult + 2.2; -- 5*0.44
 					end
-					--print(bonusHit);
-					--print(skillRank.."/"..(skillRank+skillModifier).."(+"..skillModifier..")");
 				end
 			end
 		end

@@ -181,7 +181,7 @@ function UIConfig:SetupConfigInterface()
     InterfaceOptions_AddCategory(CSC_ConfigFrame);
 
     -- Title and font
-    CSC_ConfigFrame.title = CreateFrame("Frame", "DungeonSettings", CSC_ConfigFrame);
+    CSC_ConfigFrame.title = CreateFrame("Frame", "CharacterStatsClassic", CSC_ConfigFrame);
     CSC_ConfigFrame.title:SetPoint("TOPLEFT", CSC_ConfigFrame, "TOPLEFT", 10, -10);
     CSC_ConfigFrame.title:SetWidth(300);
     CSC_ConfigFrame.titleString = CSC_ConfigFrame.title:CreateFontString(nil, "OVERLAY", "GameFontNormal");
