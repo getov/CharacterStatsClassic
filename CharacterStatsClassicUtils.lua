@@ -732,20 +732,27 @@ local function CSC_GetBlockValue(unit)
 	local blockFromShield = 0;
 	local offHandIndex = 17;
 
+	local blockValueIDs = { ITEM_MOD_BLOCK_RATING_SHORT, ITEM_MOD_BLOCK_RATING, ITEM_MOD_BLOCK_VALUE };
+
 	local hasItem = CSC_ScanTooltip:SetInventoryItem(unit, offHandIndex);
 	if hasItem then
 		local maxLines = CSC_ScanTooltip:NumLines();
 		for line=1, maxLines do
 			local leftText = getglobal(CSC_ScanTooltipPrefix.."TextLeft"..line);
 			if leftText:GetText() then
-				local valueTxt = string.match(leftText:GetText(), "%d+ "..ITEM_MOD_BLOCK_RATING_SHORT);
-				if valueTxt then
-					valueTxt = string.match(valueTxt, "%d+");
+				for blockValueID=1, 3 do
+					local valueTxt = string.match(leftText:GetText(), "%d+ "..blockValueIDs[blockValueID]);
+					if not valueTxt then
+						valueTxt = string.match(leftText:GetText(), string.sub( blockValueIDs[blockValueID], 1, -5).." %d+");
+					end
 					if valueTxt then
-						local numValue = tonumber(valueTxt);
-						if numValue then
-							blockFromShield = numValue;
-							break;
+						valueTxt = string.match(valueTxt, "%d+");
+						if valueTxt then
+							local numValue = tonumber(valueTxt);
+							if numValue then
+								blockFromShield = blockFromShield+numValue;
+--								break;
+							end
 						end
 					end
 				end
