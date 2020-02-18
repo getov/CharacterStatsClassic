@@ -153,37 +153,54 @@ end
 
 local function CSC_GetPlayerMissChances(unit, playerHit)
 	local hitChance = playerHit;
+	local totalWeaponSkill = nil;
 	local missChanceVsNPC = 5; -- Level 60 npcs with 300 def
 	local missChanceVsBoss = 9;
 	local missChanceVsPlayer = 5; -- Level 60 player def is 300 base
 
 	local mainHandItemId = 16;
 
-	local itemId = GetInventoryItemID(unit, mainHandItemId);
-	if (itemId) then
-		local itemSubtypeId = select(7, GetItemInfoInstant(itemId));
-		if itemSubtypeId then
-			local weaponString = weaponStringByWeaponId[itemSubtypeId];
-			if weaponString then
-				local skillRank, skillModifier = CSC_GetSkillRankAndModifier(CSC_WEAPON_SKILLS_HEADER, weaponString);
-				if skillRank and skillModifier then
-					-- Weapon skill from racials should be already in skillRank
-					local totalWeaponSkill = skillRank + skillModifier;
-					local bossDefense = 315; -- level 63
-					
-					local playerBossDeltaSkill = bossDefense - totalWeaponSkill;
-					
-					if (playerBossDeltaSkill > 10) then
-						if (hitChance >= 1) then
-							hitChance = hitChance - 1;
-						end
+-- ########
+-- Rebuild the function "GetShapeshiftForm" since it is not present in classic
+	local shapeIndex = 0;
+	for possibleForm=1, GetNumShapeshiftForms() do
+		if select(2, GetShapeshiftFormInfo(possibleForm)) then
+			shapeIndex = possibleForm;
+		end
+	end
+-- #########
 
-						missChanceVsBoss = 5 + (playerBossDeltaSkill * 0.2);
-					else
-						missChanceVsBoss = 5 + (playerBossDeltaSkill * 0.1);
+	local unitClassLoc = select(2, UnitClass(unit));
+	if (unitClassLoc == "DRUID") and (shapeIndex > 0) then
+		totalWeaponSkill = UnitLevel(unit)*5;
+	else
+		local itemId = GetInventoryItemID(unit, mainHandItemId);
+		if (itemId) then
+			local itemSubtypeId = select(7, GetItemInfoInstant(itemId));
+			if itemSubtypeId then
+				local weaponString = weaponStringByWeaponId[itemSubtypeId];
+				if weaponString then
+					local skillRank, skillModifier = CSC_GetSkillRankAndModifier(CSC_WEAPON_SKILLS_HEADER, weaponString);
+					if skillRank and skillModifier then
+						-- Weapon skill from racials should be already in skillRank
+						totalWeaponSkill = skillRank + skillModifier;
 					end
 				end
 			end
+		end
+	end
+
+	if totalWeaponSkill then
+		local bossDefense = 315; -- level 63
+		local playerBossDeltaSkill = bossDefense - totalWeaponSkill;
+
+		if (playerBossDeltaSkill > 10) then
+			if (hitChance >= 1) then
+				hitChance = hitChance - 1;
+			end
+				missChanceVsBoss = 5 + (playerBossDeltaSkill * 0.2);
+		else
+			missChanceVsBoss = 5 + (playerBossDeltaSkill * 0.1);
 		end
 	end
 
