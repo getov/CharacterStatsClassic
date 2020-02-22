@@ -747,6 +747,10 @@ local function CSC_GetBlockValue(unit)
 	local firstItemslotIndex = 1;
 	local lastItemslotIndex = 18;
 
+	local equippedMightSetItems = 0;
+	local requiredMightSetItems = 3;
+	local bonusMightSet = 30;
+	local mightSetIDs = { 16861, 16862, 16863, 16864, 16865, 16866, 16867, 16868 };
 	local blockValueIDs = { ITEM_MOD_BLOCK_RATING_SHORT, ITEM_MOD_BLOCK_RATING, ITEM_MOD_BLOCK_VALUE };
 
 	for itemslot=firstItemslotIndex, lastItemslotIndex do
@@ -756,6 +760,15 @@ local function CSC_GetBlockValue(unit)
 			for line=1, maxLines do
 				local leftText = getglobal(CSC_ScanTooltipPrefix.."TextLeft"..line);
 				if leftText:GetText() then
+					if not string.match(leftText:GetText() ,"%S") then break end
+					if line == 1 then
+						for mightSetID=1, 8 do
+							local itemName = select(1, GetItemInfo(mightSetIDs[mightSetID]));
+							if leftText:GetText() == itemName then
+								equippedMightSetItems = equippedMightSetItems+1;
+							end
+						end
+					end
 					for blockValueID=1, 3 do
 						local valueTxt = string.match(leftText:GetText(), "%d+ "..blockValueIDs[blockValueID]);
 						if not valueTxt then
@@ -779,6 +792,10 @@ local function CSC_GetBlockValue(unit)
 	local strStatIndex = 1;
 	local strength = select(2, UnitStat(unit, strStatIndex));
 	local blockValue = blockFromShield + (strength / 20);
+
+	if equippedMightSetItems >= requiredMightSetItems then
+		blockValue = blockValue + bonusMightSet;
+	end
 
 	return blockValue;
 end
