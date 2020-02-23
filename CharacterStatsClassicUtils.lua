@@ -794,12 +794,6 @@ function CSC_PaperDollFrame_SetBlock(statFrame, unit)
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_BLOCK, blockChance, true, blockChance);
 
 	statFrame.blockChance = string.format("%.2F", blockChance).."%";
-	if CharacterStatsClassicDB.useBlizzardBlockValue then
-		statFrame.blockValue = GetShieldBlock();
-	else
-		statFrame.blockValue = CSC_GetBlockValue(unit);
-	end
-
 	statFrame:Show();
 end
 
@@ -822,12 +816,6 @@ function CSC_PaperDollFrame_SetSpellPower(statFrame, unit)
 	end
 
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_SPELLPOWER, BreakUpLargeNumbers(maxSpellDmg), false, maxSpellDmg);
-	statFrame.holyDmg = GetSpellBonusDamage(2);
-	statFrame.fireDmg = GetSpellBonusDamage(3);
-	statFrame.natureDmg = GetSpellBonusDamage(4);
-	statFrame.frostDmg = GetSpellBonusDamage(5);
-	statFrame.shadowDmg = GetSpellBonusDamage(6);
-	statFrame.arcaneDmg = GetSpellBonusDamage(7);
 	statFrame:Show();
 end
 
@@ -892,6 +880,14 @@ function CSC_CharacterDamageFrame_OnEnter(self)
 end
 
 function CSC_CharacterSpellDamageFrame_OnEnter(self)
+	
+	self.holyDmg = GetSpellBonusDamage(2);
+	self.fireDmg = GetSpellBonusDamage(3);
+	self.natureDmg = GetSpellBonusDamage(4);
+	self.frostDmg = GetSpellBonusDamage(5);
+	self.shadowDmg = GetSpellBonusDamage(6);
+	self.arcaneDmg = GetSpellBonusDamage(7);
+
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(STAT_SPELLPOWER, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(STAT_SPELLPOWER_TOOLTIP);
@@ -929,6 +925,13 @@ function CSC_CharacterManaRegenFrame_OnEnter(self)
 end
 
 function CSC_CharacterBlock_OnEnter(self)
+	
+	if CharacterStatsClassicDB.useBlizzardBlockValue then
+		self.blockValue = GetShieldBlock();
+	else
+		self.blockValue = CSC_GetBlockValue("player");
+	end
+	
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(" ", HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(BLOCK_CHANCE..": ", self.blockChance);
