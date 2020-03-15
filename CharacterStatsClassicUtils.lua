@@ -763,14 +763,14 @@ local function CSC_GetBlockValue(unit)
 	for itemslot=firstItemslotIndex, lastItemslotIndex do
 		local hasItem = CSC_ScanTooltip:SetInventoryItem(unit, itemslot);
 		if hasItem then
-			local maxLines = CSC_ScanTooltip:NumLines();
-			for line=1, maxLines do
-				local leftText = getglobal(CSC_ScanTooltipPrefix.."TextLeft"..line);
-				if leftText:GetText() then
-					local itemId = GetInventoryItemID(unit, itemslot);
-					if (itemId == battlegearOfMightIDs[itemId]) then
-						equippedMightSetItems = equippedMightSetItems + 1;
-					else
+			local itemId = GetInventoryItemID(unit, itemslot);
+			if (itemId == battlegearOfMightIDs[itemId]) then
+				equippedMightSetItems = equippedMightSetItems + 1;
+			else
+				local maxLines = CSC_ScanTooltip:NumLines();
+				for line=1, maxLines do
+					local leftText = getglobal(CSC_ScanTooltipPrefix.."TextLeft"..line);
+					if leftText:GetText() then
 						for blockValueID=1, 3 do
 							local valueTxt = string.match(leftText:GetText(), "%d+ "..blockValueIDs[blockValueID]);
 							if not valueTxt then
@@ -797,7 +797,7 @@ local function CSC_GetBlockValue(unit)
 	local blockValue = blockValueFromItems + (strength / 20);
 	
 	local requiredMightSetItems = 3;
-	if (equippedMightSetItems == requiredMightSetItems) then
+	if (equippedMightSetItems >= requiredMightSetItems) then
 		blockValue = blockValue + 30; -- Set bonus reached
 	end
 
