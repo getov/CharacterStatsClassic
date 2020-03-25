@@ -201,13 +201,13 @@ local function CSC_GetPlayerMissChances(unit, playerHit)
 		end
 	end
 
-	local dwMissChanceVsNpc = math.max(0, (missChanceVsNPC*0.8 + 20) - hitChance);
+	local dwMissChanceVsNpc = math.max(0, (missChanceVsNPC*0.8 + 20) - playerHit);
 	local dwMissChanceVsBoss = math.max(0, (missChanceVsBoss*0.8 + 20) - hitChance);
-	local dwMissChanceVsPlayer = math.max(0, (missChanceVsPlayer*0.8 + 20) - hitChance);
+	local dwMissChanceVsPlayer = math.max(0, (missChanceVsPlayer*0.8 + 20) - playerHit);
 
-	missChanceVsNPC = math.max(0, missChanceVsNPC - hitChance);
+	missChanceVsNPC = math.max(0, missChanceVsNPC - playerHit);
 	missChanceVsBoss = math.max(0, missChanceVsBoss - hitChance);
-	missChanceVsPlayer = math.max(0, missChanceVsPlayer - hitChance);
+	missChanceVsPlayer = math.max(0, missChanceVsPlayer - playerHit);
 
 	return missChanceVsNPC, missChanceVsBoss, missChanceVsPlayer, dwMissChanceVsNpc, dwMissChanceVsBoss, dwMissChanceVsPlayer;
 end
