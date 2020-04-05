@@ -151,16 +151,9 @@ local function CSC_GetSkillRankAndModifier(skillHeader, skillName)
 	return skillRank, skillModifier;
 end
 
-local function CSC_GetPlayerMissChances(unit, playerHit)
-	local hitChance = playerHit;
-	local missChanceVsNPC = 5; -- Level 60 npcs with 300 def
-	local missChanceVsBoss = 9;
-	local missChanceVsPlayer = 5; -- Level 60 player def is 300 base
+local function CSC_GetPlayerWeaponSkill(unit)
 	local totalWeaponSkill = nil;
-
 	local mainHandItemId = 16;
-	local unitClassLoc = select(2, UnitClass(unit));
-
 	-- Druid checks
 	local shapeIndex = -1;
 	if (unitClassLoc == "DRUID") then
@@ -185,6 +178,15 @@ local function CSC_GetPlayerMissChances(unit, playerHit)
 			end
 		end
 	end
+
+	return totalWeaponSkill;
+end
+
+local function CSC_GetPlayerMissChances(unit, playerHit, totalWeaponSkill)
+	local hitChance = playerHit;
+	local missChanceVsNPC = 5; -- Level 60 npcs with 300 def
+	local missChanceVsBoss = 9;
+	local missChanceVsPlayer = 5; -- Level 60 player def is 300 base
 
 	if totalWeaponSkill then
 		local bossDefense = 315; -- level 63
@@ -456,7 +458,13 @@ end
 
 -- SECONDARY STATS --
 function CSC_PaperDollFrame_SetCritChance(statFrame, unit, category)
-    local critChance;
+	
+	statFrame:SetScript("OnEnter", CSC_CharacterMeleeCritFrame_OnEnter)
+	statFrame:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+    end)
+	
+	local critChance;
 
     if category == PLAYERSTAT_MELEE_COMBAT then
         critChance = GetCritChance();
@@ -470,7 +478,7 @@ function CSC_PaperDollFrame_SetCritChance(statFrame, unit, category)
     end
 
     CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, critChance, true, critChance);
-	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_CRITICAL_STRIKE).." "..format("%.2F%%", critChance);
+	statFrame.criticalStrikeTxt = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_CRITICAL_STRIKE).." "..format("%.2F%%", critChance);
     statFrame:Show();
 end
 
@@ -963,7 +971,8 @@ end
 function CSC_CharacterHitChanceFrame_OnEnter(self)
 	local hitChance = self.hitChance;
 
-	local missChanceVsNPC, missChanceVsBoss, missChanceVsPlayer, dwMissChanceVsNpc, dwMissChanceVsBoss, dwMissChanceVsPlayer = CSC_GetPlayerMissChances("player", hitChance);
+	local totalWeaponSkill = CSC_GetPlayerWeaponSkill("player");
+	local missChanceVsNPC, missChanceVsBoss, missChanceVsPlayer, dwMissChanceVsNpc, dwMissChanceVsBoss, dwMissChanceVsPlayer = CSC_GetPlayerMissChances("player", hitChance, totalWeaponSkill);
 
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(STAT_HIT_CHANCE, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
@@ -974,6 +983,46 @@ function CSC_CharacterHitChanceFrame_OnEnter(self)
 	GameTooltip:AddDoubleLine(format("    Level 60 NPC: %.2F%%", missChanceVsNPC), format("(Dual wield: %.2F%%)", dwMissChanceVsNpc));
 	GameTooltip:AddDoubleLine(format("    Level 60 Player: %.2F%%", missChanceVsPlayer), format("(Dual wield: %.2F%%)", dwMissChanceVsPlayer));
 	GameTooltip:AddDoubleLine(format("    Level 63 NPC/Boss: %.2F%%", missChanceVsBoss), format("(Dual wield: %.2F%%)", dwMissChanceVsBoss));
+	GameTooltip:Show();
+end
+
+function CSC_CharacterMeleeCritFrame_OnEnter(self)
+	local hitChance = GetHitModifier();
+	local totalWeaponSkill = CSC_GetPlayerWeaponSkill("player");
+	local missChanceVsNPC, missChanceVsBoss, missChanceVsPlayer, dwMissChanceVsNpc, dwMissChanceVsBoss, dwMissChanceVsPlayer = CSC_GetPlayerMissChances("player", hitChance, totalWeaponSkill);
+
+	local critSuppression = 4.8;
+	local glancingChance = 40;
+
+	local extraWeaponSkill = totalWeaponSkill - 300;
+	local bossDefense = 315; -- level 63
+	local skillBossDelta = bossDefense - totalWeaponSkill;
+	local dodgeChance = 5 + (skillBossDelta * 0.1);	
+	local critCap = 100 - missChanceVsBoss - dodgeChance - glancingChance + critSuppression + (extraWeaponSkill * 0.04);
+
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	GameTooltip:SetText(self.criticalStrikeTxt, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddLine(" "); -- Blank line.
+	GameTooltip:AddLine("Crit cap vs.");
+	
+	local critChance = GetCritChance();
+	local CRITCAP_COLOR_CODE = GREEN_FONT_COLOR_CODE;
+	if critChance > critCap then CRITCAP_COLOR_CODE = ORANGE_FONT_COLOR_CODE end
+	local critCapTxt = CRITCAP_COLOR_CODE..format("%.2F%%", critCap)..FONT_COLOR_CODE_CLOSE;
+
+	local offhandItemId = GetInventoryItemID("player", INVSLOT_OFFHAND);
+	if offhandItemId then
+		local critCapDw = 100 - dwMissChanceVsBoss - dodgeChance - glancingChance + critSuppression + (extraWeaponSkill * 0.04);
+		
+		local DWCRITCAP_COLOR_CODE = GREEN_FONT_COLOR_CODE;
+		if critChance > critCapDw then DWCRITCAP_COLOR_CODE = ORANGE_FONT_COLOR_CODE end
+
+		local critCapDwTxt = DWCRITCAP_COLOR_CODE..format("%.2F%%", critCapDw)..FONT_COLOR_CODE_CLOSE;
+		GameTooltip:AddDoubleLine("    Level 63 NPC/Boss: "..critCapTxt, "(Dual wield: "..critCapDwTxt..")");
+	else
+		GameTooltip:AddDoubleLine("    Level 63 NPC/Boss: "..critCapTxt);
+	end
+
 	GameTooltip:Show();
 end
 -- OnEnter Tooltip functions END
