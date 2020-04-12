@@ -991,6 +991,9 @@ function CSC_CharacterMeleeCritFrame_OnEnter(self)
 	local totalWeaponSkill = CSC_GetPlayerWeaponSkill("player");
 	local missChanceVsNPC, missChanceVsBoss, missChanceVsPlayer, dwMissChanceVsNpc, dwMissChanceVsBoss, dwMissChanceVsPlayer = CSC_GetPlayerMissChances("player", hitChance, totalWeaponSkill);
 
+	-- no weapon equipped, not supported localization or something else went wrong
+	if not totalWeaponSkill then totalWeaponSkill = 300 end
+
 	local critSuppression = 4.8;
 	local glancingChance = 40;
 
