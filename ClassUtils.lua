@@ -119,3 +119,73 @@ function CSC_GetShapeshiftForm()
 
 	return shapeIndex;
 end
+
+function CSC_GetMP5ModifierFromTalents(unit)
+    local unitClassId = select(3, UnitClass(unit));
+	local spellRank = 0;
+
+	if unitClassId == 5 then -- Priest
+		-- Meditation
+        spellRank = select(5, GetTalentInfo(1, 8));
+	elseif unitClassId == 8 then -- Mage
+		-- Arcane Meditation
+        spellRank = select(5, GetTalentInfo(1, 12));
+	elseif unitClassId == 11 then -- Druid
+		-- Reflection
+        spellRank = select(5, GetTalentInfo(3, 6));
+	end
+	
+	local modifier = spellRank * 0.05;
+
+    return modifier;
+end
+
+function CSC_GetMP5ModifierFromSetBonus(unit)
+	local unitClassId = select(3, UnitClass(unit));
+	local modifier = 0;
+	
+	-- not Druid (11) or Priest (5)
+	if unitClassId ~= 11 and unitClassId ~= 5 then
+		return modifier;
+	end
+	
+	local firstItemslotIndex = 1;
+	local lastItemslotIndex = 18;
+
+	local vestmentsOfTranscendenceIDs = { [16925] = 16925, 
+										  [16926] = 16926, 
+										  [16919] = 16919, 
+										  [16921] = 16921, 
+										  [16920] = 16920, 
+									   	  [16922] = 16922, 
+										  [16924] = 16924, 
+										  [16923] = 16923
+										};
+
+	local stormrageRaimentIDs = { [16897] = 16897, 
+								  [16898] = 16898, 
+								  [16899] = 16899, 
+								  [16900] = 16900, 
+								  [16901] = 16901, 
+								  [16902] = 16902, 
+								  [16903] = 16903, 
+								  [16904] = 16904
+								};
+
+	local equippedSetItems = 0;
+    for itemSlot = firstItemslotIndex, lastItemslotIndex do
+        local itemId = GetInventoryItemID(unit, itemslot);
+		
+		if (itemId) then
+			if (itemId == vestmentsOfTranscendenceIDs[itemId] or itemId == stormrageRaimentIDs[itemId]) then
+				equippedSetItems = equippedSetItems + 1;
+			end
+		end
+    end
+
+    if equippedSetItems >= 3 then
+        modifier = 0.15;
+	end
+
+    return modifier;
+end

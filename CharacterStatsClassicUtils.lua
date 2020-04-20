@@ -10,6 +10,9 @@ local CSC_ScanTooltip = CreateFrame("GameTooltip", "CSC_ScanTooltip", nil, "Game
 CSC_ScanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
 local CSC_ScanTooltipPrefix = "CSC_ScanTooltip";
 
+local g_lastSeenBaseManaRegen = 0;
+local g_lastSeenCastingManaRegen = 0;
+
 local weaponStringByWeaponId = {
 	[LE_ITEM_WEAPON_AXE1H] 		= CSC_WEAPON_AXE1H_TXT,
 	[LE_ITEM_WEAPON_AXE2H] 		= CSC_WEAPON_AXE2H_TXT,
@@ -863,19 +866,33 @@ function CSC_PaperDollFrame_SetManaRegen(statFrame, unit)
     end)
 
 	-- There is a bug in GetManaRegen() so I have to manually calculate mp5
-	local base, combat = GetManaRegen();
-	local mp5 = CSC_GetMP5FromGear(unit);
+	-- base == casting always and this is wrong
+	local base, casting = GetManaRegen();
+	
+	-- to avoid the wrongly reported "0" regen after an update
+	if base < 1 then base = g_lastSeenBaseManaRegen end
+	if casting < 1 then casting = g_lastSeenBaseManaRegen end
+	g_lastSeenBaseManaRegen = base;
+	g_lastSeenCastingManaRegen = casting;
+
+	local mp5FromGear = CSC_GetMP5FromGear(unit);
+	local mp5ModifierCasting = CSC_GetMP5ModifierFromTalents(unit);
+	mp5ModifierCasting = mp5ModifierCasting + CSC_GetMP5ModifierFromSetBonus(unit);
 	
 	-- All mana regen stats are displayed as mana/5 sec.
-	base = floor(base * 5.0) + mp5;
-	combat = mp5; --floor(combat * 5.0);
+	local regenWhenNotCasting = floor(base * 5.0) + mp5FromGear;
+	casting = mp5FromGear; -- if GetManaRegen() gets fixed ever, this should be changed
 
-	local baseText = BreakUpLargeNumbers(base);
-	local combatText = BreakUpLargeNumbers(combat);
-	-- Combat mana regen is most important to the player, so we display it as the main value
-	CSC_PaperDollFrame_SetLabelAndText(statFrame, MANA_REGEN, combatText, false, combat);
-	statFrame.mp5Casting = combatText;
-	statFrame.mp5NotCasting = baseText;
+	if mp5ModifierCasting > 0 then
+		casting = casting + base * mp5ModifierCasting * 5.0;
+	end
+
+	local regenWhenNotCastingText = BreakUpLargeNumbers(regenWhenNotCasting);
+	local castingText = BreakUpLargeNumbers(casting);
+	-- While Casting mana regen is most important to the player, so we display it as the main value
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, MANA_REGEN, castingText, false, casting);
+	statFrame.mp5Casting = castingText;
+	statFrame.mp5NotCasting = regenWhenNotCastingText;
 	statFrame:Show();
 end
 
@@ -946,8 +963,6 @@ end
 function CSC_CharacterManaRegenFrame_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(MANA_REGEN_TOOLTIP, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-	GameTooltip:AddDoubleLine("!!! Currently detects MP5 from gear only !!!", "", 1, 0, 0);
-	GameTooltip:AddLine(" "); -- Blank line.
 	GameTooltip:AddDoubleLine(MANA_REGEN.." (While Casting):", self.mp5Casting);
 	GameTooltip:AddDoubleLine(MANA_REGEN.." (While Not Casting):", self.mp5NotCasting);
 	GameTooltip:Show();
