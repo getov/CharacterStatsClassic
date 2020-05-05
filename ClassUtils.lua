@@ -174,7 +174,7 @@ function CSC_GetMP5ModifierFromSetBonus(unit)
 
 	local equippedSetItems = 0;
     for itemSlot = firstItemslotIndex, lastItemslotIndex do
-        local itemId = GetInventoryItemID(unit, itemslot);
+        local itemId = GetInventoryItemID(unit, itemSlot);
 		
 		if (itemId) then
 			if (itemId == vestmentsOfTranscendenceIDs[itemId] or itemId == stormrageRaimentIDs[itemId]) then

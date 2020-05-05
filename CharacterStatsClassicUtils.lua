@@ -891,6 +891,7 @@ function CSC_PaperDollFrame_SetManaRegen(statFrame, unit)
 	local castingText = BreakUpLargeNumbers(casting);
 	-- While Casting mana regen is most important to the player, so we display it as the main value
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, MANA_REGEN, castingText, false, casting);
+	statFrame.mp5FromGear = BreakUpLargeNumbers(mp5FromGear);
 	statFrame.mp5Casting = castingText;
 	statFrame.mp5NotCasting = regenWhenNotCastingText;
 	statFrame:Show();
@@ -963,6 +964,7 @@ end
 function CSC_CharacterManaRegenFrame_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(MANA_REGEN_TOOLTIP, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine(MANA_REGEN.." (From Gear):", self.mp5FromGear);
 	GameTooltip:AddDoubleLine(MANA_REGEN.." (While Casting):", self.mp5Casting);
 	GameTooltip:AddDoubleLine(MANA_REGEN.." (While Not Casting):", self.mp5NotCasting);
 	GameTooltip:Show();
