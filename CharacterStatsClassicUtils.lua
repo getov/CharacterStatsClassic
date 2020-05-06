@@ -2,10 +2,6 @@
     Util functions that wrap my interface and the Blizzard's WoW Classic lua API code for ease of use
 ]]
 
-local function DebugBreakPrint()
-    print("ERROR");
-end
-
 local CSC_ScanTooltip = CreateFrame("GameTooltip", "CSC_ScanTooltip", nil, "GameTooltipTemplate");
 CSC_ScanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
 local CSC_ScanTooltipPrefix = "CSC_ScanTooltip";
@@ -614,16 +610,37 @@ function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
 end
 
 function CSC_PaperDollFrame_SetSpellHitChance(statFrame, unit)
+	
+	statFrame:SetScript("OnEnter", CSC_CharacterSpellHitChanceFrame_OnEnter)
+	statFrame:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
+
 	local hitChance = GetSpellHitModifier();
 	
 	if not hitChance then
 		hitChance = 0;
 	end
 
+	local additionalHit = 0;
+	local unitClassId = select(3, UnitClass(unit));
+
+	if unitClassId == CSC_MAGE_CLASS_ID then
+		local arcaneHit, frostFireHit = CSC_GetMageSpellHitFromTalents();
+		additionalHit = max(arcaneHit, frostFireHit);
+		statFrame.arcaneHit = arcaneHit;
+		statFrame.frostHit = frostFireHit;
+		statFrame.fireHit = frostFireHit;
+	elseif unitClassId == CSC_WARLOCK_CLASS_ID then
+		additionalHit = CSC_GetWarlockSpellHitFromTalents();
+		statFrame.afflictionHit = additionalHit;
+	end
+
+	hitChance = hitChance + additionalHit;
+
 	local hitChanceText = hitChance;
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_HIT_CHANCE, hitChanceText, true, hitChance);
-	statFrame.tooltip = STAT_HIT_CHANCE.." "..hitChanceText;
-	statFrame.tooltip2 = format(CR_HIT_SPELL_TOOLTIP, UnitLevel(unit), hitChance);
+	statFrame.unitClassId = unitClassId;
 	statFrame:Show();
 end
 
@@ -1000,6 +1017,22 @@ function CSC_CharacterHitChanceFrame_OnEnter(self)
 	GameTooltip:AddDoubleLine(format("    Level 60 NPC: %.2F%%", missChanceVsNPC), format("(Dual wield: %.2F%%)", dwMissChanceVsNpc));
 	GameTooltip:AddDoubleLine(format("    Level 60 Player: %.2F%%", missChanceVsPlayer), format("(Dual wield: %.2F%%)", dwMissChanceVsPlayer));
 	GameTooltip:AddDoubleLine(format("    Level 63 NPC/Boss: %.2F%%", missChanceVsBoss), format("(Dual wield: %.2F%%)", dwMissChanceVsBoss));
+	GameTooltip:Show();
+end
+
+function CSC_CharacterSpellHitChanceFrame_OnEnter(self)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	GameTooltip:SetText("Total spell hit chance\nfrom gear and talents.", HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+
+	if self.unitClassId == CSC_MAGE_CLASS_ID then
+		GameTooltip:AddLine(" "); -- Blank line.
+		GameTooltip:AddDoubleLine("Arcane Spell Hit", self.arcaneHit);
+		GameTooltip:AddDoubleLine("Fire Spell Hit", self.fireHit);
+		GameTooltip:AddDoubleLine("Frost Spell Hit", self.frostHit);
+	elseif self.unitClassId == CSC_WARLOCK_CLASS_ID then
+		GameTooltip:AddLine(" "); -- Blank line.
+		GameTooltip:AddDoubleLine("Affliction Spell Hit", self.afflictionHit);
+	end
 	GameTooltip:Show();
 end
 
