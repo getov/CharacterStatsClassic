@@ -505,8 +505,8 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 	statFrame.shadowCrit = GetSpellCritChance(6);
 	statFrame.arcaneCrit = GetSpellCritChance(7);
 
-	local unitClassLoc = select(2, UnitClass(unit));
-	if (unitClassLoc == "MAGE") then
+	local unitClassId = select(3, UnitClass(unit));
+	if (unitClassId == CSC_MAGE_CLASS_ID) then
 		local arcaneInstabilityCrit, criticalMassCrit = CSC_GetMageCritStatsFromTalents();
 		if (arcaneInstabilityCrit > 0) then
 			-- increases the crit of all spell schools
@@ -524,20 +524,20 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 			-- set the new maximum
 			maxSpellCrit = max(maxSpellCrit, statFrame.fireCrit);
 		end
-	elseif (unitClassLoc == "PRIEST") then
+	elseif (unitClassId == CSC_PRIEST_CLASS_ID) then
 		local priestHolyCrit = CSC_GetPriestCritStatsFromTalents();
 		if (priestHolyCrit > 0) then
 			statFrame.holyCrit = statFrame.holyCrit + priestHolyCrit;
 			-- set the new maximum
 			maxSpellCrit = max(maxSpellCrit, statFrame.holyCrit);
 		end
-	elseif (unitClassLoc == "PALADIN") then
-		--[[local paladinHolyCrit = CSC_GetPaladinCritStatsFromTalents();
-		if (paladinHolyCrit > 0) then
-			statFrame.holyCrit = statFrame.holyCrit + paladinHolyCrit;
+	elseif (unitClassId == CSC_WARLOCK_CLASS_ID) then
+		local destructionCrit = CSC_GetWarlockCritStatsFromTalents();
+		if (destructionCrit > 0) then
+			statFrame.shadowCrit = statFrame.shadowCrit + destructionCrit;
 			-- set the new maximum
-			maxSpellCrit = max(maxSpellCrit, statFrame.holyCrit);
-		end]]
+			maxSpellCrit = max(maxSpellCrit, statFrame.shadowCrit);
+		end
 	end
 
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, maxSpellCrit, true, maxSpellCrit);
@@ -622,24 +622,20 @@ function CSC_PaperDollFrame_SetSpellHitChance(statFrame, unit)
 		hitChance = 0;
 	end
 
-	local additionalHit = 0;
 	local unitClassId = select(3, UnitClass(unit));
 
 	if unitClassId == CSC_MAGE_CLASS_ID then
 		local arcaneHit, frostFireHit = CSC_GetMageSpellHitFromTalents();
-		additionalHit = max(arcaneHit, frostFireHit);
 		statFrame.arcaneHit = arcaneHit;
 		statFrame.frostHit = frostFireHit;
 		statFrame.fireHit = frostFireHit;
 	elseif unitClassId == CSC_WARLOCK_CLASS_ID then
-		additionalHit = CSC_GetWarlockSpellHitFromTalents();
-		statFrame.afflictionHit = additionalHit;
+		statFrame.afflictionHit = CSC_GetWarlockSpellHitFromTalents();
 	end
-
-	hitChance = hitChance + additionalHit;
 
 	local hitChanceText = hitChance;
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_HIT_CHANCE, hitChanceText, true, hitChance);
+	statFrame.hitChance = hitChance;
 	statFrame.unitClassId = unitClassId;
 	statFrame:Show();
 end
@@ -1022,16 +1018,20 @@ end
 
 function CSC_CharacterSpellHitChanceFrame_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-	GameTooltip:SetText("Total spell hit chance\nfrom gear and talents.", HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:SetText(format(CSC_SPELL_HIT_TOOLTIP_TXT, self.hitChance), HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	local tabSymbol = "    "; -- for some reason "\t" doesn't work
 
 	if self.unitClassId == CSC_MAGE_CLASS_ID then
 		GameTooltip:AddLine(" "); -- Blank line.
-		GameTooltip:AddDoubleLine("Arcane Spell Hit", self.arcaneHit);
-		GameTooltip:AddDoubleLine("Fire Spell Hit", self.fireHit);
-		GameTooltip:AddDoubleLine("Frost Spell Hit", self.frostHit);
+		GameTooltip:AddLine(CSC_SPELL_HIT_SUBTOOLTIP_TXT);
+		GameTooltip:AddDoubleLine(tabSymbol..CSC_ARCANE_SPELL_HIT_TXT, (self.arcaneHit + self.hitChance).."%");
+		GameTooltip:AddDoubleLine(tabSymbol..CSC_FIRE_SPELL_HIT_TXT, (self.fireHit + self.hitChance).."%");
+		GameTooltip:AddDoubleLine(tabSymbol..CSC_FROST_SPELL_HIT_TXT, (self.frostHit + self.hitChance).."%");
 	elseif self.unitClassId == CSC_WARLOCK_CLASS_ID then
 		GameTooltip:AddLine(" "); -- Blank line.
-		GameTooltip:AddDoubleLine("Affliction Spell Hit", self.afflictionHit);
+		GameTooltip:AddLine(CSC_SPELL_HIT_SUBTOOLTIP_TXT);
+		GameTooltip:AddDoubleLine(tabSymbol..CSC_DESTRUCTION_SPELL_HIT_TXT, self.hitChance.."%");
+		GameTooltip:AddDoubleLine(tabSymbol..CSC_AFFLICTION_SPELL_HIT_TXT, (self.afflictionHit + self.hitChance).."%");
 	end
 	GameTooltip:Show();
 end

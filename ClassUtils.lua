@@ -66,6 +66,14 @@ function CSC_GetWarlockSpellHitFromTalents()
 	return afflictionHit;
 end
 
+-- returns the spell crit from Devastation talent
+function CSC_GetWarlockCritStatsFromTalents()
+	-- the spell rank is equal to the value
+	local devastationCrit = select(5, GetTalentInfo(3, 7));
+
+	return devastationCrit;
+end
+
 -- returns the combined crit stats from Holy Specialization and Force of Will
 function CSC_GetPriestCritStatsFromTalents()
 	
