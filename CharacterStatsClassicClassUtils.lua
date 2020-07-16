@@ -85,17 +85,10 @@ end
 
 -- returns the crit bonus from Holy Power
 function CSC_GetPaladinCritStatsFromTalents()
-
-	local holyPowerCrit = 0;
-	local critTable = { 1, 2, 3, 4, 5 };
-
 	-- Holy Power (1, 2, 3, 4, 5)%
 	local spellRank = select(5, GetTalentInfo(1, 13));
-	if (spellRank > 0) and (spellRank <= 5) then
-		holyPowerCrit = critTable[spellRank];
-    end
 
-	return holyPowerCrit;
+	return spellRank;
 end
 
 -- returns the defense bonus from the Anticipation Prot talent
