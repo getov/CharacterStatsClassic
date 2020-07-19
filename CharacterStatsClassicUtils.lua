@@ -532,6 +532,8 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 		end
 	elseif (unitClassId == CSC_PRIEST_CLASS_ID) then
 		local priestHolyCrit = CSC_GetPriestCritStatsFromTalents();
+		priestHolyCrit = priestHolyCrit + CSC_GetHolyCritFromBenediction(unit);
+		
 		if (priestHolyCrit > 0) then
 			statFrame.holyCrit = statFrame.holyCrit + priestHolyCrit;
 			-- set the new maximum

@@ -220,3 +220,14 @@ function CSC_GetShamanT2SpellCrit(unit)
 
     return spellCritFromSet;
 end
+
+function CSC_GetHolyCritFromBenediction(unit)
+	local benedictionCrit = 0;
+	local itemId = GetInventoryItemID(unit, INVSLOT_MAINHAND);
+
+	if itemId == 18608 then
+		benedictionCrit = 2;
+	end
+
+	return benedictionCrit;
+end
