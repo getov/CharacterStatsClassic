@@ -22,7 +22,10 @@ g_WeaponStringByWeaponId = {
 	[LE_ITEM_WEAPON_SWORD2H] 	= CSC_WEAPON_SWORD2H_TXT,
 	[LE_ITEM_WEAPON_STAFF] 		= CSC_WEAPON_STAFF_TXT,
 	[LE_ITEM_WEAPON_UNARMED] 	= CSC_WEAPON_UNARMED_TXT,
-	[LE_ITEM_WEAPON_DAGGER] 	= CSC_WEAPON_DAGGER_TXT
+    [LE_ITEM_WEAPON_DAGGER] 	= CSC_WEAPON_DAGGER_TXT,
+    [LE_ITEM_WEAPON_BOWS]       = CSC_WEAPON_BOW_TXT,
+    [LE_ITEM_WEAPON_CROSSBOW]   = CSC_WEAPON_CROSSBOW_TXT,
+    [LE_ITEM_WEAPON_GUNS]       = CSC_WEAPON_GUN_TXT
 };
 
 -- Class set items IDs
@@ -98,4 +101,7 @@ g_CombatManaRegenSpellIdToModifier = {
     [22782] = 0.3,
     [22783] = 0.3
 };
+
+CSC_SYMBOL_TAB   = "    "; -- for some reason "\t" doesn't work
+CSC_SYMBOL_SPACE = " ";
                                 

@@ -42,9 +42,10 @@ local function CSC_GetAppropriateAttackRaiting(unit, category)
 	return attackWithModifier;
 end
 
-local function CSC_PaperDollFrame_SetLabelAndText(statFrame, label, text, isPercentage, numericValue)
+local function CSC_PaperDollFrame_SetLabelAndText(statFrame, label, text, isPercentage, numericValue, precision)
 	if ( isPercentage ) then
-		statFrame.Value:SetText(format("%.1F%%", numericValue));
+		precision = precision or "%.1F%%";
+		statFrame.Value:SetText(format(precision, numericValue));
 	else
 		statFrame.Value:SetText(text);
 	end
@@ -137,9 +138,8 @@ local function CSC_GetSkillRankAndModifier(skillHeader, skillName)
 	return skillRank, skillModifier;
 end
 
-function CSC_GetPlayerWeaponSkill(unit)
+function CSC_GetPlayerWeaponSkill(unit, weaponSlotId)
 	local totalWeaponSkill = nil;
-	local mainHandItemId = 16;
 
 	local unitClassId = select(3, UnitClass(unit));
 	-- Druid checks
@@ -151,7 +151,7 @@ function CSC_GetPlayerWeaponSkill(unit)
 	if (unitClassId == CSC_DRUID_CLASS_ID) and (shapeIndex > 0) then
 		totalWeaponSkill = UnitLevel(unit) * 5;
 	else
-		local itemId = GetInventoryItemID(unit, mainHandItemId);
+		local itemId = GetInventoryItemID(unit, weaponSlotId);
 		if (itemId) then
 			local itemSubtypeId = select(7, GetItemInfoInstant(itemId));
 			if itemSubtypeId then
@@ -458,28 +458,32 @@ function CSC_PaperDollFrame_SetRangedAttackPower(statFrame, unit)
 end
 
 -- SECONDARY STATS --
-function CSC_PaperDollFrame_SetCritChance(statFrame, unit, category)
+function CSC_PaperDollFrame_SetCritChance(statFrame, unit)
 	
 	statFrame:SetScript("OnEnter", CSC_CharacterMeleeCritFrame_OnEnter)
 	statFrame:SetScript("OnLeave", function()
 		GameTooltip:Hide()
     end)
 	
-	local critChance;
-
-    if category == PLAYERSTAT_MELEE_COMBAT then
-        critChance = GetCritChance();
-	elseif category == PLAYERSTAT_RANGED_COMBAT then
-		if not IsRangedWeapon() then
-			CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, NOT_APPLICABLE, false, 0);
-			statFrame:Show();
-			return;
-		end
-        critChance = GetRangedCritChance();
-    end
+	local critChance = GetCritChance();
 
     CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, critChance, true, critChance);
 	statFrame.criticalStrikeTxt = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_CRITICAL_STRIKE).." "..format("%.2F%%", critChance);
+    statFrame:Show();
+end
+
+function CSC_PaperDollFrame_SetRangedCritChance(statFrame, unit)
+
+	if not IsRangedWeapon() then
+		CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, NOT_APPLICABLE, false, 0);
+		statFrame:Show();
+		return;
+	end
+
+	local critChance = GetRangedCritChance();
+
+    CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, critChance, true, critChance);
+	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_CRITICAL_STRIKE).." "..format("%.2F%%", critChance);
     statFrame:Show();
 end
 
@@ -579,7 +583,7 @@ local function CSC_GetHitFromBiznicksAccurascope(unit)
 		local itemId, enchantId = itemLink:match("item:(%d+):(%d*)");
 		if enchantId then
 			if tonumber(enchantId) == 2523 then
-				hitFromScope = hitFromScope + 3;
+				hitFromScope = 3;
 			end
 		end
 	end
@@ -594,6 +598,11 @@ function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
 		statFrame:Show();
 		return;
 	end
+
+	statFrame:SetScript("OnEnter", CSC_CharacterRangedHitChanceFrame_OnEnter)
+	statFrame:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
 	
 	local hitChance = GetHitModifier();
 	
@@ -608,8 +617,7 @@ function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
 
 	local hitChanceText = hitChance;
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_HIT_CHANCE, hitChanceText, true, hitChance);
-	statFrame.tooltip = STAT_HIT_CHANCE.." "..hitChanceText;
-	statFrame.tooltip2 = format(CR_HIT_RANGED_TOOLTIP, UnitLevel(unit), hitChance);
+	statFrame.hitChance = hitChance;
 	statFrame:Show();
 end
 
@@ -747,14 +755,14 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 	statFrame.tooltip = tooltipText;
 	tooltipText = format(DEFAULT_STATDEFENSE_TOOLTIP, valueNum, 0, valueNum*0.04, valueNum*0.04);
 	tooltipText = tooltipText:gsub('.-\n', '', 1);
-	tooltipText = tooltipText:gsub('%b()', '');
+	tooltipText = tooltipText:gsub('\n|cff888888%b()|r', '');
 	statFrame.tooltip2 = tooltipText;
 	statFrame:Show();
 end
 
 function CSC_PaperDollFrame_SetDodge(statFrame, unit)
 	local chance = GetDodgeChance();
-	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_DODGE, chance, true, chance);
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_DODGE, chance, true, chance, "%.2F%%");
 	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, DODGE_CHANCE).." "..string.format("%.2F", chance).."%";
 	--statFrame.tooltip2 = format(CR_DODGE_TOOLTIP, GetCombatRating(CR_DODGE), GetCombatRatingBonus(CR_DODGE));
 	statFrame:Show();
@@ -762,7 +770,7 @@ end
 
 function CSC_PaperDollFrame_SetParry(statFrame, unit)
 	local chance = GetParryChance();
-	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_PARRY, chance, true, chance);
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_PARRY, chance, true, chance, "%.2F%%");
 	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, PARRY_CHANCE).." "..string.format("%.2F", chance).."%";
 	--statFrame.tooltip2 = format(CR_PARRY_TOOLTIP, GetCombatRating(CR_PARRY), GetCombatRatingBonus(CR_PARRY));
 	statFrame:Show();
@@ -830,7 +838,7 @@ function CSC_PaperDollFrame_SetBlock(statFrame, unit)
 	end)
 	
 	local blockChance = GetBlockChance();
-	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_BLOCK, blockChance, true, blockChance);
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_BLOCK, blockChance, true, blockChance, "%.2F%%");
 
 	statFrame.blockChance = string.format("%.2F", blockChance).."%";
 	statFrame:Show();
