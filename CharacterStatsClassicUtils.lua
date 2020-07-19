@@ -542,13 +542,6 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 			-- set the new maximum
 			maxSpellCrit = max(maxSpellCrit, tmpMax);
 		end
-	elseif (unitClassId == CSC_SHAMAN_CLASS_ID) then
-		local natureCritFromSet = CSC_GetShamanT2SpellCrit(unit);
-		if (natureCritFromSet > 0) then
-			statFrame.natureCrit = statFrame.natureCrit + natureCritFromSet;
-			-- set the new maximum
-			maxSpellCrit = max(maxSpellCrit, statFrame.natureCrit);
-		end
 	end
 
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, maxSpellCrit, true, maxSpellCrit);
