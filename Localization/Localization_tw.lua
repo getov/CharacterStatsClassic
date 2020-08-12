@@ -13,9 +13,9 @@ CSC_WEAPON_SWORD2H_TXT      = "雙手劍";
 CSC_WEAPON_STAFF_TXT        = "法杖";
 CSC_WEAPON_UNARMED_TXT      = "拳套";
 CSC_WEAPON_DAGGER_TXT       = "匕首";
-CSC_WEAPON_BOW_TXT          = "Bows";
-CSC_WEAPON_CROSSBOW_TXT     = "Crossbows";
-CSC_WEAPON_GUN_TXT          = "Guns";
+CSC_WEAPON_BOW_TXT          = "弓箭";
+CSC_WEAPON_CROSSBOW_TXT     = "弩";
+CSC_WEAPON_GUN_TXT          = "槍械";
 CSC_HIT_BIZNICKS_TXT        = HIT;
 
 CSC_SPELL_HIT_TOOLTIP_TXT       = "法術命中（裝備）: %d%%";
