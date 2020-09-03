@@ -7,6 +7,7 @@ The addon has two columns with drop downs for different categories of stats:
  - Spell
  - Defenses
 
-Important notice:
 
-Some of the Blizzard's Addon API functions are not working as expected or not at all (GetManaRegen(), GetHitModifier(), etc.)). This has also been reported by other addon developers. So if Blizzard don't fix the API I will have to find a workaround.
+Reporting Bugs (How to):
+
+Describe the issue and provide a proof that something is broken. Use https://classic.wowhead.com/gear-planner to provide reference stats without my addon + an in-game screenshot with my addon so that I can see and compare. I simply cannot test all the classes and all the gear combinations. I've had people false-report "bugs" too many times. Not doing so will lead to me dismissing the bug.
