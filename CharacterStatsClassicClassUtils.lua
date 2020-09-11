@@ -106,6 +106,24 @@ local function CSC_GetPaladinDefenseFromTalents()
     return defense;
 end
 
+-- returns the modifier from Improved Blessing of Wisdom Holy talent
+function CSC_GetPaladinImprovedBoWModifier()
+	-- Improved Blessing of Wisdom
+	local spellRank = select(5, GetTalentInfo(1, 10));
+
+	return spellRank * 0.1;
+end
+
+-- Checks if spellId is Blessing of Wisdom
+function CSC_IsBoWSpellId(spellId)
+
+	if (spellId == 19742 or spellId == 19850 or spellId == 19852 or spellId == 19853 or spellId == 19854 or spellId == 25290) then
+		return true;
+	end
+
+	return false;
+end
+
 -- returns the defense bonus from the Anticipation Prot talent
 local function CSC_GetWarriorDefenseFromTalents()
     
@@ -224,10 +242,38 @@ end
 function CSC_GetHolyCritFromBenediction(unit)
 	local benedictionCrit = 0;
 	local itemId = GetInventoryItemID(unit, INVSLOT_MAINHAND);
-
+	
 	if itemId == 18608 then
 		benedictionCrit = 2;
 	end
 
 	return benedictionCrit;
+end
+
+function CSC_GetBlockValueFromWarriorZGEnchants(unit)
+	local blockValue = 0;
+
+	if CSC_HasEnchant(unit, INVSLOT_HEAD, 2583) then
+		blockValue = blockValue + 15;
+	end
+
+	if CSC_HasEnchant(unit, INVSLOT_LEGS, 2583) then
+		blockValue = blockValue + 15;
+	end
+
+	return blockValue;
+end
+
+function CSC_GetMp5FromPriestZGEnchants(unit)
+	local mp5 = 0;
+
+	if CSC_HasEnchant(unit, INVSLOT_HEAD, 2590) then
+		mp5 = mp5 + 4;
+	end
+
+	if CSC_HasEnchant(unit, INVSLOT_LEGS, 2590) then
+		mp5 = mp5 + 4;
+	end
+
+	return mp5;
 end

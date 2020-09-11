@@ -68,6 +68,14 @@ function CSC_CharacterBlock_OnEnter(self)
 		self.blockValue = GetShieldBlock();
 	else
 		self.blockValue = CSC_GetBlockValue("player");
+		
+		local unitClassId = select(3, UnitClass("player"));
+		if (unitClassId == CSC_WARRIOR_CLASS_ID) then
+			local blockFromZGEnchants = CSC_GetBlockValueFromWarriorZGEnchants("player");
+			if (blockFromZGEnchants > 0) then
+				self.blockValue = self.blockValue + blockFromZGEnchants;
+			end
+		end
 	end
 	
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
