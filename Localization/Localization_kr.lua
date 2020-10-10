@@ -19,9 +19,12 @@ CSC_WEAPON_GUN_TXT          = "Guns";
 CSC_HIT_BIZNICKS_TXT        = HIT;
 
 CSC_SPELL_HIT_TOOLTIP_TXT       = "장비에 의한 주문 적중률: %d%%";
+CSC_SPELL_HIT_TOOLTIP_2_TXT     = "Spell Hit chance (Gear and Talents): %d%%";
 CSC_SPELL_HIT_SUBTOOLTIP_TXT    = "주문 적중률 (장비 + 특성):";
 CSC_ARCANE_SPELL_HIT_TXT        = "비전 주문 적중";
 CSC_FIRE_SPELL_HIT_TXT          = "화염 주문 적중";
 CSC_FROST_SPELL_HIT_TXT         = "냉기 주문 적중";
 CSC_DESTRUCTION_SPELL_HIT_TXT   = "파괴 주문 적중";
 CSC_AFFLICTION_SPELL_HIT_TXT    = "고통 주문 적중";
+
+CSC_LIGHTNING_TXT = "Lightning";

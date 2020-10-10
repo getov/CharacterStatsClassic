@@ -83,6 +83,13 @@ function CSC_GetPriestCritStatsFromTalents()
 	return critCombined;
 end
 
+-- returns the healing modifier from Spiritual Healing talent for Priests
+function CSC_GetPriestBonusHealingModifierFromTalents()
+	-- Spiritual Healing
+	local spellRank = select(5, GetTalentInfo(2, 15));
+	return spellRank * 0.02;
+end
+
 -- returns the crit bonus from Holy Power
 function CSC_GetPaladinCritStatsFromTalents()
 	-- Holy Power (1, 2, 3, 4, 5)%
@@ -166,6 +173,36 @@ function CSC_GetShapeshiftForm()
 	return shapeIndex;
 end
 
+-- returns the bonus hit from Nature's Guidance talent (counts as melee and spell hit)
+function CSC_GetShamanHitFromTalents()
+	-- Nature's Guidance
+	local spellRank = select(5, GetTalentInfo(3, 6));
+	return spellRank;
+end
+
+-- returns the bonus crit from the Call of Thunder talent for Shamans
+function CSC_GetShamanCallOfThunderCrit()
+	local bonusCrit = 0;
+	local talentTable = { 1, 2, 3, 4, 6 };
+
+	-- Call of Thunder (Lightning)
+	local spellRank = select(5, GetTalentInfo(1, 8));
+
+    if (spellRank > 0) and (spellRank <=5) then
+		bonusCrit = talentTable[spellRank];
+	end
+
+	return bonusCrit;
+end
+
+-- returns the bonus crit from the Tidal Mastery telent for Shamans
+function CSC_GetShamanTidalMasteryCrit()
+	-- Tidal Mastery (Nature/Lightning)
+	local spellRank = select(5, GetTalentInfo(3, 11));
+	return spellRank;
+end
+
+-- ITEMS AND ENCHANTS RELATED
 function CSC_GetMP5ModifierFromTalents(unit)
     local unitClassId = select(3, UnitClass(unit));
 	local spellRank = 0;

@@ -570,7 +570,25 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 			-- set the new maximum
 			maxSpellCrit = max(maxSpellCrit, tmpMax);
 		end
+	elseif (unitClassId == CSC_SHAMAN_CLASS_ID) then
+		statFrame.lightningCrit = statFrame.natureCrit;
+		
+		local callOfThunderCrit = CSC_GetShamanCallOfThunderCrit();
+		if callOfThunderCrit > 0 then
+			statFrame.lightningCrit = statFrame.lightningCrit + callOfThunderCrit;
+		end
+
+		local tidalMastery = CSC_GetShamanTidalMasteryCrit();
+		if tidalMastery > 0 then
+			statFrame.lightningCrit = statFrame.lightningCrit + tidalMastery;
+			statFrame.natureCrit = statFrame.natureCrit + tidalMastery;
+		end
+
+		local tmpMax = max(statFrame.lightningCrit, statFrame.natureCrit);
+		-- set the new maximum
+		maxSpellCrit = max(maxSpellCrit, tmpMax);
 	end
+	statFrame.unitClassId = unitClassId;
 
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, maxSpellCrit, true, maxSpellCrit);
 
@@ -588,6 +606,14 @@ function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
 	
 	if not hitChance then
 		hitChance = 0;
+	end
+
+	local unitClassId = select(3, UnitClass(unit));
+	if unitClassId == CSC_SHAMAN_CLASS_ID then
+		local hitFromTalents = CSC_GetShamanHitFromTalents();
+		if hitFromTalents > 0 then
+			hitChance = hitChance + hitFromTalents;
+		end
 	end
 
 	local hitChanceText = hitChance;
@@ -667,6 +693,11 @@ function CSC_PaperDollFrame_SetSpellHitChance(statFrame, unit)
 		statFrame.fireHit = frostFireHit;
 	elseif unitClassId == CSC_WARLOCK_CLASS_ID then
 		statFrame.afflictionHit = CSC_GetWarlockSpellHitFromTalents();
+	elseif unitClassId == CSC_SHAMAN_CLASS_ID then
+		local hitFromTalents = CSC_GetShamanHitFromTalents();
+		if hitFromTalents > 0 then
+			hitChance = hitChance + hitFromTalents;
+		end
 	end
 
 	local hitChanceText = hitChance;
@@ -973,7 +1004,16 @@ function CSC_PaperDollFrame_SetManaRegen(statFrame, unit)
 end
 
 function CSC_PaperDollFrame_SetHealing(statFrame, unit)
+	local unitClassId = select(3, UnitClass(unit));
 	local healing = GetSpellBonusHealing();
+
+	if unitClassId == CSC_PRIEST_CLASS_ID then
+		local healingModifier = CSC_GetPriestBonusHealingModifierFromTalents();
+		if (healingModifier > 0) then
+			healing = healing * healingModifier + healing;
+		end
+	end
+
 	local healingText = healing;
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_SPELLHEALING, healingText, false, healing);
 	statFrame.tooltip = STAT_SPELLHEALING.." "..healing;
