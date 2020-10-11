@@ -608,14 +608,6 @@ function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
 		hitChance = 0;
 	end
 
-	local unitClassId = select(3, UnitClass(unit));
-	if unitClassId == CSC_SHAMAN_CLASS_ID then
-		local hitFromTalents = CSC_GetShamanHitFromTalents();
-		if hitFromTalents > 0 then
-			hitChance = hitChance + hitFromTalents;
-		end
-	end
-
 	local hitChanceText = hitChance;
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_HIT_CHANCE, hitChanceText, true, hitChance);
 	statFrame.hitChance = hitChance;
@@ -693,11 +685,6 @@ function CSC_PaperDollFrame_SetSpellHitChance(statFrame, unit)
 		statFrame.fireHit = frostFireHit;
 	elseif unitClassId == CSC_WARLOCK_CLASS_ID then
 		statFrame.afflictionHit = CSC_GetWarlockSpellHitFromTalents();
-	elseif unitClassId == CSC_SHAMAN_CLASS_ID then
-		local hitFromTalents = CSC_GetShamanHitFromTalents();
-		if hitFromTalents > 0 then
-			hitChance = hitChance + hitFromTalents;
-		end
 	end
 
 	local hitChanceText = hitChance;
@@ -1006,13 +993,6 @@ end
 function CSC_PaperDollFrame_SetHealing(statFrame, unit)
 	local unitClassId = select(3, UnitClass(unit));
 	local healing = GetSpellBonusHealing();
-
-	if unitClassId == CSC_PRIEST_CLASS_ID then
-		local healingModifier = CSC_GetPriestBonusHealingModifierFromTalents();
-		if (healingModifier > 0) then
-			healing = healing * healingModifier + healing;
-		end
-	end
 
 	local healingText = healing;
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_SPELLHEALING, healingText, false, healing);
