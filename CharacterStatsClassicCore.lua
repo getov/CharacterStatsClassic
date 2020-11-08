@@ -3,9 +3,11 @@ local _, core = ...;
 
 local characterStatsClassicEventFrame = CreateFrame("Frame");
 characterStatsClassicEventFrame:RegisterEvent("PLAYER_ENTERING_WORLD");
+characterStatsClassicEventFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED");
+characterStatsClassicEventFrame:RegisterEvent("UNIT_POWER_UPDATE");
 characterStatsClassicEventFrame:RegisterEvent("UNIT_MODEL_CHANGED");
+characterStatsClassicEventFrame:RegisterEvent("UNIT_AURA");
 characterStatsClassicEventFrame:RegisterEvent("UNIT_LEVEL");
-characterStatsClassicEventFrame:RegisterEvent("UNIT_RESISTANCES");
 characterStatsClassicEventFrame:RegisterEvent("UNIT_STATS");
 characterStatsClassicEventFrame:RegisterEvent("UNIT_DAMAGE");
 characterStatsClassicEventFrame:RegisterEvent("UNIT_RANGEDDAMAGE");
@@ -14,10 +16,12 @@ characterStatsClassicEventFrame:RegisterEvent("UNIT_ATTACK_SPEED");
 characterStatsClassicEventFrame:RegisterEvent("UNIT_ATTACK_POWER");
 characterStatsClassicEventFrame:RegisterEvent("UNIT_RANGED_ATTACK_POWER");
 characterStatsClassicEventFrame:RegisterEvent("UNIT_ATTACK");
-characterStatsClassicEventFrame:RegisterEvent("PLAYER_GUILD_UPDATE");
 characterStatsClassicEventFrame:RegisterEvent("SKILL_LINES_CHANGED");
+characterStatsClassicEventFrame:RegisterEvent("UPDATE_SHAPESHIFT_FORM");
 
 characterStatsClassicEventFrame:SetScript("OnEvent",
     function(self, event, ...)
-        core.UIConfig:UpdateStats();
+        C_Timer.After(0.5, function ()
+            core.UIConfig:UpdateStats();
+        end)
     end)
