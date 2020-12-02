@@ -1,4 +1,4 @@
-## Interface: 11305
+## Interface: 11306
 ## Author: Peter Getov
 ## Version: 3.6.7
 ## Title: |cff00aeffCharacterStatsClassic|r
