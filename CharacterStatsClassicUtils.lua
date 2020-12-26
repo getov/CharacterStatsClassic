@@ -253,6 +253,16 @@ function CSC_GetAttackPowerFromArgentDawnItems(unit)
 		apVsUndead = apVsUndead + g_ArgentDawnAPItems[trinketSecond];
 	end
 
+	local tempMHEnchantId = select(4, GetWeaponEnchantInfo());
+	if (tempMHEnchantId == 2684) then -- Consecrated Sharpening Stone
+		apVsUndead = apVsUndead + 100;
+	end
+
+	local tempOHEnchantId = select(8, GetWeaponEnchantInfo());
+	if (tempOHEnchantId == 2684) then -- Consecrated Sharpening Stone
+		apVsUndead = apVsUndead + 100;
+	end
+
 	return apVsUndead;
 end
 
@@ -283,6 +293,16 @@ function CSC_GetSpellkPowerFromArgentDawnItems(unit)
 
 	if (g_ArgentDawnSPItems[trinketSecond] ~= nil) then
 		spVsUndead = spVsUndead + g_ArgentDawnSPItems[trinketSecond];
+	end
+
+	local tempMHEnchantId = select(4, GetWeaponEnchantInfo());
+	if (tempMHEnchantId == 2684) then -- Blessed Wizard Oil
+		spVsUndead = spVsUndead + 60;
+	end
+
+	local tempOHEnchantId = select(8, GetWeaponEnchantInfo());
+	if (tempOHEnchantId == 2684) then -- Blessed Wizard Oil
+		spVsUndead = spVsUndead + 60;
 	end
 
 	return spVsUndead;
