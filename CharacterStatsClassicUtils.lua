@@ -223,6 +223,70 @@ function CSC_HasEnchant(unit, slotId, enchantId)
 
 	return false;
 end
+
+function CSC_GetAttackPowerFromArgentDawnItems(unit)
+	local chestId = GetInventoryItemID(unit, INVSLOT_CHEST);
+	local glovesId = GetInventoryItemID(unit, INVSLOT_HAND);
+	local bracerId = GetInventoryItemID(unit, INVSLOT_WRIST);
+	local trinketFirst = GetInventoryItemID(unit, INVSLOT_TRINKET1);
+	local trinketSecond = GetInventoryItemID(unit, INVSLOT_TRINKET2);
+
+	local apVsUndead = 0;
+	
+	if (g_ArgentDawnAPItems[chestId] ~= nil) then
+		apVsUndead = apVsUndead + g_ArgentDawnAPItems[chestId];
+	end
+
+	if (g_ArgentDawnAPItems[glovesId] ~= nil) then
+		apVsUndead = apVsUndead + g_ArgentDawnAPItems[glovesId];
+	end
+
+	if (g_ArgentDawnAPItems[bracerId] ~= nil) then
+		apVsUndead = apVsUndead + g_ArgentDawnAPItems[bracerId];
+	end
+
+	if (g_ArgentDawnAPItems[trinketFirst] ~= nil) then
+		apVsUndead = apVsUndead + g_ArgentDawnAPItems[trinketFirst];
+	end
+
+	if (g_ArgentDawnAPItems[trinketSecond] ~= nil) then
+		apVsUndead = apVsUndead + g_ArgentDawnAPItems[trinketSecond];
+	end
+
+	return apVsUndead;
+end
+
+function CSC_GetSpellkPowerFromArgentDawnItems(unit)
+	local chestId = GetInventoryItemID(unit, INVSLOT_CHEST);
+	local glovesId = GetInventoryItemID(unit, INVSLOT_HAND);
+	local bracerId = GetInventoryItemID(unit, INVSLOT_WRIST);
+	local trinketFirst = GetInventoryItemID(unit, INVSLOT_TRINKET1);
+	local trinketSecond = GetInventoryItemID(unit, INVSLOT_TRINKET2);
+
+	local spVsUndead = 0;
+	
+	if (g_ArgentDawnSPItems[chestId] ~= nil) then
+		spVsUndead = spVsUndead + g_ArgentDawnSPItems[chestId];
+	end
+
+	if (g_ArgentDawnSPItems[glovesId] ~= nil) then
+		spVsUndead = spVsUndead + g_ArgentDawnSPItems[glovesId];
+	end
+
+	if (g_ArgentDawnSPItems[bracerId] ~= nil) then
+		spVsUndead = spVsUndead + g_ArgentDawnSPItems[bracerId];
+	end
+
+	if (g_ArgentDawnSPItems[trinketFirst] ~= nil) then
+		spVsUndead = spVsUndead + g_ArgentDawnSPItems[trinketFirst];
+	end
+
+	if (g_ArgentDawnSPItems[trinketSecond] ~= nil) then
+		spVsUndead = spVsUndead + g_ArgentDawnSPItems[trinketSecond];
+	end
+
+	return spVsUndead;
+end
 -- GENERAL UTIL FUNCTIONS END --
 
 -- PRIMARY STATS --
@@ -446,12 +510,17 @@ end
 function CSC_PaperDollFrame_SetMeleeAttackPower(statFrame, unit)
     
 	local base, posBuff, negBuff = UnitAttackPower(unit);
+
+	if (UISettingsCharacter.showStatsFromArgentDawnItems) then
+		local apFromAD = CSC_GetAttackPowerFromArgentDawnItems(unit);
+		posBuff = posBuff + apFromAD;
+	end
     
     local valueText, tooltipText = CSC_PaperDollFormatStat(MELEE_ATTACK_POWER, base, posBuff, negBuff);
     local valueNum = max(0, base + posBuff + negBuff);
     CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_ATTACK_POWER, valueText, false, valueNum);
     statFrame.tooltip = tooltipText;
-    statFrame.tooltip2 = format(MELEE_ATTACK_POWER_TOOLTIP, max((base+posBuff+negBuff), 0)/ATTACK_POWER_MAGIC_NUMBER);
+	statFrame.tooltip2 = format(MELEE_ATTACK_POWER_TOOLTIP, max((base+posBuff+negBuff), 0)/ATTACK_POWER_MAGIC_NUMBER);
 	statFrame:Show();
 end
 
@@ -471,6 +540,12 @@ function CSC_PaperDollFrame_SetRangedAttackPower(statFrame, unit)
 	end
 
 	local base, posBuff, negBuff = UnitRangedAttackPower(unit);
+
+	if (UISettingsCharacter.showStatsFromArgentDawnItems) then
+		local apFromAD = CSC_GetAttackPowerFromArgentDawnItems(unit);
+		posBuff = posBuff + apFromAD;
+	end
+	
     local valueText, tooltipText = CSC_PaperDollFormatStat(RANGED_ATTACK_POWER, base, posBuff, negBuff);
     local valueNum = max(0, base + posBuff + negBuff);
     CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_ATTACK_POWER, valueText, false, valueNum);
@@ -904,6 +979,12 @@ function CSC_PaperDollFrame_SetSpellPower(statFrame, unit)
 		maxSpellDmg = max(maxSpellDmg, bonusDamage);
 	end
 
+	if (UISettingsCharacter.showStatsFromArgentDawnItems) then
+		local spFromAD = CSC_GetSpellkPowerFromArgentDawnItems(unit);
+		maxSpellDmg = maxSpellDmg + spFromAD;
+		statFrame.spVsUndead = maxSpellDmg;
+	end
+
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_SPELLPOWER, BreakUpLargeNumbers(maxSpellDmg), false, maxSpellDmg);
 	statFrame:Show();
 end
@@ -973,7 +1054,7 @@ function CSC_PaperDollFrame_SetManaRegen(statFrame, unit)
 	end
 	
 	-- All mana regen stats are displayed as mana/5 sec.
-	local regenWhenNotCasting = floor(base * 5.0) + mp5FromGear + mp5FromAuras;
+	local regenWhenNotCasting = (base * 5.0) + mp5FromGear + mp5FromAuras;
 	casting = mp5FromGear + mp5FromAuras; -- if GetManaRegen() gets fixed ever, this should be changed
 
 	if mp5ModifierCasting > 0 then
