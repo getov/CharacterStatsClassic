@@ -114,6 +114,10 @@ local function CSC_GetMP5FromGear(unit)
 		end
 	end
 
+	if (CSC_HasEnchant(unit, INVSLOT_WRIST, 2565)) then -- Mana Regen
+		mp5 = mp5 + 4;
+	end
+
 	return mp5;
 end
 
