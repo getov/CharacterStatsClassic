@@ -296,12 +296,12 @@ function CSC_GetSpellkPowerFromArgentDawnItems(unit)
 	end
 
 	local tempMHEnchantId = select(4, GetWeaponEnchantInfo());
-	if (tempMHEnchantId == 2684) then -- Blessed Wizard Oil
+	if (tempMHEnchantId == 2685) then -- Blessed Wizard Oil
 		spVsUndead = spVsUndead + 60;
 	end
 
 	local tempOHEnchantId = select(8, GetWeaponEnchantInfo());
-	if (tempOHEnchantId == 2684) then -- Blessed Wizard Oil
+	if (tempOHEnchantId == 2685) then -- Blessed Wizard Oil
 		spVsUndead = spVsUndead + 60;
 	end
 
