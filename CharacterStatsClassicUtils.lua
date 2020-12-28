@@ -311,6 +311,38 @@ function CSC_GetSpellkPowerFromArgentDawnItems(unit)
 
 	return spVsUndead;
 end
+
+function CSC_GetDefense(unit)
+	local numSkills = GetNumSkillLines();
+	local skillIndex = 0;
+	local currentHeader = nil;
+	local playerLevel = UnitLevel(unit);
+
+	for i = 1, numSkills do
+		local skillName = select(1, GetSkillLineInfo(i));
+		local isHeader = select(2, GetSkillLineInfo(i));
+
+		if isHeader ~= nil and isHeader then
+			currentHeader = skillName;
+		else
+			if (currentHeader == CSC_WEAPON_SKILLS_HEADER and skillName == CSC_DEFENSE) then
+				skillIndex = i;
+				break;
+			end
+		end
+	end
+
+	local skillRank, skillModifier;
+	if (skillIndex > 0) then
+		skillRank = select(4, GetSkillLineInfo(skillIndex));
+		skillModifier = select(6, GetSkillLineInfo(skillIndex));
+	else
+		-- Use this as a backup, just in case something goes wrong
+		skillRank, skillModifier = UnitDefense(unit); --Not working properly
+	end
+
+	return skillRank, skillModifier, playerLevel;
+end
 -- GENERAL UTIL FUNCTIONS END --
 
 -- PRIMARY STATS --
@@ -856,32 +888,12 @@ end
 
 function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 
-	local numSkills = GetNumSkillLines();
-	local skillIndex = 0;
-	local currentHeader = nil;
+	statFrame:SetScript("OnEnter", CSC_CharacterDefenseFrame_OnEnter)
+	statFrame:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
 
-	for i = 1, numSkills do
-		local skillName = select(1, GetSkillLineInfo(i));
-		local isHeader = select(2, GetSkillLineInfo(i));
-
-		if isHeader ~= nil and isHeader then
-			currentHeader = skillName;
-		else
-			if (currentHeader == CSC_WEAPON_SKILLS_HEADER and skillName == CSC_DEFENSE) then
-				skillIndex = i;
-				break;
-			end
-		end
-	end
-
-	local skillRank, skillModifier;
-	if (skillIndex > 0) then
-		skillRank = select(4, GetSkillLineInfo(skillIndex));
-		skillModifier = select(6, GetSkillLineInfo(skillIndex));
-	else
-		-- Use this as a backup, just in case something goes wrong
-		skillRank, skillModifier = UnitDefense(unit); --Not working properly
-	end
+	local  skillRank, skillModifier, playerLevel = CSC_GetDefense(unit);
 
 	local posBuff = 0;
 	local negBuff = 0;
@@ -890,14 +902,10 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 	elseif ( skillModifier < 0 ) then
 		negBuff = skillModifier;
 	end
-	local valueText, tooltipText = CSC_PaperDollFormatStat(DEFENSE_COLON, skillRank, posBuff, negBuff);
+	local valueText, defenseText = CSC_PaperDollFormatStat(DEFENSE_COLON, skillRank, posBuff, negBuff);
 	local valueNum = max(0, skillRank + posBuff + negBuff);
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, CSC_DEFENSE, valueText, false, valueNum);
-	statFrame.tooltip = tooltipText;
-	tooltipText = format(DEFAULT_STATDEFENSE_TOOLTIP, valueNum, 0, valueNum*0.04, valueNum*0.04);
-	tooltipText = tooltipText:gsub('.-\n', '', 1);
-	tooltipText = tooltipText:gsub('\n|cff888888%b()|r', '');
-	statFrame.tooltip2 = tooltipText;
+	statFrame.defense = defenseText;
 	statFrame:Show();
 end
 

@@ -192,4 +192,19 @@ function CSC_CharacterMeleeCritFrame_OnEnter(self)
 
 	GameTooltip:Show();
 end
+
+function CSC_CharacterDefenseFrame_OnEnter(self)
+	local npcWeaponskill = playerLevel*5; -- same level as player
+	local bossWeaponskill = 315; -- level 63
+	local defenseValue, defenseModifier, playerLevel = CSC_GetDefense("player");
+
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	GameTooltip:SetText("Defense \nIncreases chance to Dodge, Block and Parry.\nDecreases chance to be hit and critically hit.", HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+
+	GameTooltip:AddLine(CSC_SYMBOL_SPACE); -- Blank line.
+	GameTooltip:AddLine("Effect vs.");
+	GameTooltip:AddLine(format(CSC_SYMBOL_TAB.."Level "..playerLevel.." NPC: %.2F%%", math.max(0, defenseValue+defenseModifier-npcWeaponskill)*0.04));
+	GameTooltip:AddLine(format(CSC_SYMBOL_TAB.."Level 63 NPC/Boss: %.2F%%", math.max(0, defenseValue+defenseModifier-bossWeaponskill)*0.04));
+	GameTooltip:Show();
+end
 -- OnEnter Tooltip functions END
