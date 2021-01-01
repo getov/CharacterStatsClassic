@@ -199,8 +199,8 @@ function CSC_CharacterDefenseFrame_OnEnter(self)
 	local bossWeaponskill = 315; -- level 63
 
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-	GameTooltip:SetText("Defense \nIncreases chance to Dodge, Block and Parry.\nDecreases chance to be hit and critically hit.", HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-
+	GameTooltip:SetText(CSC_DEFENSE, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddLine("Increases chance to Dodge, Block and Parry.\nDecreases chance to be hit and critically hit.");
 	GameTooltip:AddLine(CSC_SYMBOL_SPACE); -- Blank line.
 	GameTooltip:AddLine("Effect vs.");
 	GameTooltip:AddLine(format(CSC_SYMBOL_TAB.."Level "..playerLevel.." NPC: %.2F%%", math.max(0, defenseValue+defenseModifier-npcWeaponskill)*0.04));
