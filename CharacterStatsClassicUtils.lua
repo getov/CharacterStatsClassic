@@ -8,6 +8,7 @@ local CSC_ScanTooltipPrefix = "CSC_ScanTooltip";
 
 local g_lastSeenBaseManaRegen = 0;
 local g_lastSeenCastingManaRegen = 0;
+g_APFromADItems = 0;
 
 -- GENERAL UTIL FUNCTIONS --
 local function CSC_GetAppropriateDamage(unit, category)
@@ -312,6 +313,10 @@ function CSC_GetSpellkPowerFromArgentDawnItems(unit)
 	return spVsUndead;
 end
 
+function CSC_CacheAPFromADItems(unit)
+	g_APFromADItems = CSC_GetAttackPowerFromArgentDawnItems(unit);
+end
+
 function CSC_GetDefense(unit)
 	local numSkills = GetNumSkillLines();
 	local skillIndex = 0;
@@ -437,13 +442,20 @@ function CSC_PaperDollFrame_SetDamage(statFrame, unit, category)
 	if speed == nil or speed == 0 then
 		speed = 1;
 	end
+
+	if (UISettingsCharacter.showStatsFromArgentDawnItems) then
+		local bonusDPS = g_APFromADItems / ATTACK_POWER_MAGIC_NUMBER;
+		local bonusDmgMainHand = speed * bonusDPS;
+		minDamage = minDamage + bonusDmgMainHand;
+		maxDamage = maxDamage + bonusDmgMainHand;
+	end
     
     local displayMin = max(floor(minDamage),1);
-    local displayMax = max(ceil(maxDamage),1);
+	local displayMax = max(ceil(maxDamage),1);
     
     minDamage = (minDamage / percentMod) - physicalBonusPos - physicalBonusNeg;
-    maxDamage = (maxDamage / percentMod) - physicalBonusPos - physicalBonusNeg;
-    
+	maxDamage = (maxDamage / percentMod) - physicalBonusPos - physicalBonusNeg;
+	
     local baseDamage = (minDamage + maxDamage) * 0.5;
 	local fullDamage = (baseDamage + physicalBonusPos + physicalBonusNeg) * percentMod;
 	local totalBonus = (fullDamage - baseDamage);
@@ -510,6 +522,13 @@ function CSC_PaperDollFrame_SetDamage(statFrame, unit, category)
 			offhandSpeed = 1;
 		end
 
+		if (UISettingsCharacter.showStatsFromArgentDawnItems) then
+			local bonusDPS = g_APFromADItems / ATTACK_POWER_MAGIC_NUMBER;
+			local bonusDmgOffHand = offhandSpeed * bonusDPS;
+			minOffHandDamage = minOffHandDamage + bonusDmgOffHand;
+			maxOffHandDamage = maxOffHandDamage + bonusDmgOffHand;
+		end
+
 		minOffHandDamage = (minOffHandDamage / percentMod) - physicalBonusPos - physicalBonusNeg;
 		maxOffHandDamage = (maxOffHandDamage / percentMod) - physicalBonusPos - physicalBonusNeg;
 
@@ -568,8 +587,7 @@ function CSC_PaperDollFrame_SetMeleeAttackPower(statFrame, unit)
 	local base, posBuff, negBuff = UnitAttackPower(unit);
 
 	if (UISettingsCharacter.showStatsFromArgentDawnItems) then
-		local apFromAD = CSC_GetAttackPowerFromArgentDawnItems(unit);
-		posBuff = posBuff + apFromAD;
+		posBuff = posBuff + g_APFromADItems;
 	end
     
     local valueText, tooltipText = CSC_PaperDollFormatStat(MELEE_ATTACK_POWER, base, posBuff, negBuff);
@@ -598,8 +616,7 @@ function CSC_PaperDollFrame_SetRangedAttackPower(statFrame, unit)
 	local base, posBuff, negBuff = UnitRangedAttackPower(unit);
 
 	if (UISettingsCharacter.showStatsFromArgentDawnItems) then
-		local apFromAD = CSC_GetAttackPowerFromArgentDawnItems(unit);
-		posBuff = posBuff + apFromAD;
+		posBuff = posBuff + g_APFromADItems;
 	end
 	
     local valueText, tooltipText = CSC_PaperDollFormatStat(RANGED_ATTACK_POWER, base, posBuff, negBuff);

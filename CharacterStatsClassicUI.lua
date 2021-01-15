@@ -81,6 +81,9 @@ function UIConfig:SetCharacterStats(statsTable, category)
         CSC_PaperDollFrame_SetParry(statsTable[4], "player");
         CSC_PaperDollFrame_SetBlock(statsTable[5], "player");
     elseif category == PLAYERSTAT_MELEE_COMBAT then
+        if (UISettingsCharacter.showStatsFromArgentDawnItems) then
+            CSC_CacheAPFromADItems("player");
+        end
         -- damage, Att Power, speed, hit raiting, crit chance
         CSC_PaperDollFrame_SetDamage(statsTable[1], "player", category);
         CSC_PaperDollFrame_SetMeleeAttackPower(statsTable[2], "player");
@@ -88,6 +91,10 @@ function UIConfig:SetCharacterStats(statsTable, category)
         CSC_PaperDollFrame_SetCritChance(statsTable[4], "player");
         CSC_PaperDollFrame_SetHitChance(statsTable[5], "player");
     elseif category == PLAYERSTAT_RANGED_COMBAT then
+        if (UISettingsCharacter.showStatsFromArgentDawnItems) then
+            CSC_CacheAPFromADItems("player");
+        end
+        
         CSC_PaperDollFrame_SetDamage(statsTable[1], "player", category);
         CSC_PaperDollFrame_SetRangedAttackPower(statsTable[2], "player");
         CSC_PaperDollFrame_SetRangedAttackSpeed(statsTable[3], "player");
