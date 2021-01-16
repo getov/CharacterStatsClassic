@@ -1,7 +1,7 @@
 ## Interface: 11306
 ## Author: Peter Getov
 ## Version: 3.7.2
-## Title: |cff00aeffCharacterStatsClassic|r
+## Title: CharacterStatsClassic
 ## Notes: Advanced Character Stats
 ## DefaultState:  enabled
 ## SavedVariables: CharacterStatsClassicDB
