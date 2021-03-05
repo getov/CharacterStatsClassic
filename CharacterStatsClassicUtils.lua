@@ -119,6 +119,15 @@ local function CSC_GetMP5FromGear(unit)
 		mp5 = mp5 + 4;
 	end
 
+	if (CSC_HasEnchant(unit, INVSLOT_SHOULDER, 2715)) then -- Resilience of the Scourge
+		mp5 = mp5 + 5;
+	end
+
+	local tempMHEnchantId = select(4, GetWeaponEnchantInfo());
+	if (tempMHEnchantId == 2629) then -- Brilliant Mana Oil
+		mp5 = mp5 + 12;
+	end
+
 	return mp5;
 end
 
