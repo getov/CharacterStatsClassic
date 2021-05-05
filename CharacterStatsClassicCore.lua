@@ -55,3 +55,12 @@ function CSC_QueuedUpdate(self)
     self:SetScript("OnUpdate", nil);
     core.UIConfig:UpdateStats();
 end
+
+-- Exposing global functions for showing/hiding the stats panel. For compatibility with other addons
+function CSC_HideStatsPanel()
+    core.UIConfig.CharacterStatsPanel:Hide();
+end
+
+function CSC_ShowStatsPanel()
+    core.UIConfig.CharacterStatsPanel:Show();
+end
