@@ -833,6 +833,10 @@ function CSC_PaperDollFrame_SetSpellHitChance(statFrame, unit)
 		hitChance = 0;
 	end
 
+	if hitChance > 0 then
+		hitChance = hitChance / 7;  -- dirty fix because the api is changed with the SOM update
+	end
+
 	local unitClassId = select(3, UnitClass(unit));
 
 	if unitClassId == CSC_MAGE_CLASS_ID then
