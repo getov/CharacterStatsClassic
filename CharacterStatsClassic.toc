@@ -1,6 +1,6 @@
-## Interface: 11307
+## Interface: 11402
 ## Author: Peter Getov
-## Version: 3.8.3
+## Version: 3.8.4
 ## Title: |cff00aeffCharacterStatsClassic|r
 ## Notes: Advanced Character Stats
 ## DefaultState:  enabled
