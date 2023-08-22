@@ -209,7 +209,7 @@ function UIConfig:SetupConfigInterface()
     -- Checkboxes
     CSC_ConfigFrame.chkBtnUseBlizzardBlockValue = CreateFrame("CheckButton", "default", CSC_ConfigFrame, "UICheckButtonTemplate");
     CSC_ConfigFrame.chkBtnUseBlizzardBlockValue:SetPoint("TOPLEFT", 20, -30);
-    CSC_ConfigFrame.chkBtnUseBlizzardBlockValue.text:SetText("Use alternative Block Value calculation (Blizzard function)");
+    CSC_ConfigFrame.chkBtnUseBlizzardBlockValue.Text:SetText("Use alternative Block Value calculation (Blizzard function)");
     CSC_ConfigFrame.chkBtnUseBlizzardBlockValue:SetChecked(UISettingsGlobal.useBlizzardBlockValue);
     CSC_ConfigFrame.chkBtnUseBlizzardBlockValue:SetScript("OnClick", 
     function()
@@ -218,7 +218,7 @@ function UIConfig:SetupConfigInterface()
 
     CSC_ConfigFrame.chkBtnShowADStats = CreateFrame("CheckButton", "default", CSC_ConfigFrame, "UICheckButtonTemplate");
     CSC_ConfigFrame.chkBtnShowADStats:SetPoint("TOPLEFT", 20, -55);
-    CSC_ConfigFrame.chkBtnShowADStats.text:SetText("Show AP and SP stats from Argent Dawn items.");
+    CSC_ConfigFrame.chkBtnShowADStats.Text:SetText("Show AP and SP stats from Argent Dawn items.");
     CSC_ConfigFrame.chkBtnShowADStats:SetChecked(UISettingsCharacter.showStatsFromArgentDawnItems);
     CSC_ConfigFrame.chkBtnShowADStats:SetScript("OnClick", 
     function()
@@ -228,7 +228,7 @@ function UIConfig:SetupConfigInterface()
     -- Stats frames alpha checkbox
     CSC_ConfigFrame.chkBtnStatsFramesAlpha = CreateFrame("CheckButton", "default", CSC_ConfigFrame, "UICheckButtonTemplate");
     CSC_ConfigFrame.chkBtnStatsFramesAlpha:SetPoint("TOPLEFT", 20, -80);
-    CSC_ConfigFrame.chkBtnStatsFramesAlpha.text:SetText("Use a transparent background for the stats frames.");
+    CSC_ConfigFrame.chkBtnStatsFramesAlpha.Text:SetText("Use a transparent background for the stats frames.");
     CSC_ConfigFrame.chkBtnStatsFramesAlpha:SetChecked(UISettingsGlobal.useTransparentStatsBackground);
     CSC_ConfigFrame.chkBtnStatsFramesAlpha:SetScript("OnClick", 
     function()
