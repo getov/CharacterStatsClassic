@@ -37,7 +37,7 @@ CSC_GenerateTalentsIndexMap = function()
 	end
 
 	g_TalentsIndexMap = talentsIndexMap;
-	print("Generated Talents Index Map...")
+	--print("Generated Talents Index Map...")
 end
 
 function CSC_GetTalentInfo(tabIndex, talentIndex)
