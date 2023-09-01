@@ -18,9 +18,14 @@ characterStatsClassicEventFrame:RegisterEvent("UNIT_MAXHEALTH");
 characterStatsClassicEventFrame:RegisterEvent("UNIT_ATTACK_POWER");
 characterStatsClassicEventFrame:RegisterEvent("UNIT_RANGED_ATTACK_POWER");
 characterStatsClassicEventFrame:RegisterEvent("COMBAT_RATING_UPDATE");
+characterStatsClassicEventFrame:RegisterEvent("VARIABLES_LOADED");
 
 characterStatsClassicEventFrame:SetScript("OnEvent",
     function(self, event, ...)
+
+        if (event == "PLAYER_ENTERING_WORLD") then
+            CSC_GenerateTalentsIndexMap();                
+        end
 
         if (not core.UIConfig.CharacterStatsPanel:IsVisible()) then
             return;

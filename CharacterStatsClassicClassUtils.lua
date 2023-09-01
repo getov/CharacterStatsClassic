@@ -2,6 +2,53 @@
     Util functions specific for Classes
 ]]
 
+g_TalentsIndexMap = nil
+CSC_GenerateTalentsIndexMap = function()
+	if g_TalentsIndexMap then return end;
+	
+	local talentsIndexMap = {};
+	for tab=1,3 do
+	   local tierColumn = {};
+	   local maxTier = 0;
+	   local numTalents = GetNumTalents(tab);
+	   if not numTalents or numTalents <= 0 then return end;
+
+	   for idx=numTalents,1,-1 do
+		  local _,_,tier,column = GetTalentInfo(tab,idx);
+		  tierColumn[tier] = tierColumn[tier] or {};
+		  tierColumn[tier][column] = idx;
+		  maxTier = tier > maxTier and tier or maxTier
+	   end
+
+	   if maxTier == 0 then return end;
+
+	   local oldIdx = 1;
+	   talentsIndexMap[tab] = {};
+
+	   for tier=1,maxTier do
+		  for column=1,4 do
+			 local wowIdx = tierColumn[tier][column];
+			 if wowIdx then
+				talentsIndexMap[tab][oldIdx] = wowIdx;
+				oldIdx = oldIdx + 1;
+			 end
+		  end
+	   end
+	end
+
+	g_TalentsIndexMap = talentsIndexMap;
+	print("Generated Talents Index Map...")
+end
+
+function CSC_GetTalentInfo(tabIndex, talentIndex)
+	if not g_TalentsIndexMap then return GetTalentInfo(tabIndex, talentIndex) end
+	
+	local newTalentIndex = g_TalentsIndexMap[tabIndex][talentIndex];
+	if not newTalentIndex then return GetTalentInfo(tabIndex, talentIndex) end
+	
+	return GetTalentInfo(tabIndex, newTalentIndex);
+end
+
 -- returns additional crit % stats from Arcane instability and Critical Mass if any
 function CSC_GetMageCritStatsFromTalents()
 
@@ -10,14 +57,14 @@ function CSC_GetMageCritStatsFromTalents()
 
 	-- Arcane Instability (1, 2, 3)%
 	local arcaneInstabilityTable = { 1, 2, 3 };
-	local spellRank = select(5, GetTalentInfo(1, 15));
+	local spellRank = select(5, CSC_GetTalentInfo(1, 15));
 	if (spellRank > 0) and (spellRank <= 3) then
 		arcaneInstabilityCrit = arcaneInstabilityTable[spellRank];
 	end
 
 	-- Critical Mass (2, 4, 6)%
 	local criticalMassTable = { 2, 4, 6 };
-	spellRank = select(5, GetTalentInfo(2, 13));
+	spellRank = select(5, CSC_GetTalentInfo(2, 13));
 	if (spellRank > 0) and (spellRank <= 3) then
 		criticalMassCrit = criticalMassTable[spellRank];
     end
@@ -31,11 +78,11 @@ function CSC_GetMageSpellHitFromTalents()
 	local frostFireHit = 0;
 
 	-- Arcane Focus
-	local spellRank = select(5, GetTalentInfo(1, 2));
+	local spellRank = select(5, CSC_GetTalentInfo(1, 2));
 	arcaneHit = spellRank * 2; -- 2% for each point
 
 	-- Elemental Precision
-	spellRank = select(5, GetTalentInfo(3, 3));
+	spellRank = select(5, CSC_GetTalentInfo(3, 3));
 	frostFireHit = spellRank * 2; -- 2% for each point
 
 	return arcaneHit, frostFireHit;
@@ -46,7 +93,7 @@ function CSC_GetWarlockSpellHitFromTalents()
 	local afflictionHit = 0;
 
 	-- Suppression
-	local spellRank = select(5, GetTalentInfo(1, 1));
+	local spellRank = select(5, CSC_GetTalentInfo(1, 1));
 	afflictionHit = spellRank * 2; -- 2% for each point
 
 	return afflictionHit;
@@ -55,7 +102,7 @@ end
 -- returns the spell crit from Devastation talent
 function CSC_GetWarlockCritStatsFromTalents()
 	-- the spell rank is equal to the value
-	local devastationCrit = select(5, GetTalentInfo(3, 7));
+	local devastationCrit = select(5, CSC_GetTalentInfo(3, 7));
 
 	return devastationCrit;
 end
@@ -68,13 +115,13 @@ function CSC_GetPriestCritStatsFromTalents()
 
 	local critTable = { 1, 2, 3, 4, 5 };
 	-- Holy Specialization (1, 2, 3, 4, 5)%
-	local spellRank = select(5, GetTalentInfo(2, 3));
+	local spellRank = select(5, CSC_GetTalentInfo(2, 3));
 	if (spellRank > 0) and (spellRank <= 5) then
 		holySpecializationCrit = critTable[spellRank];
 	end
 
 	-- Force of Will (1, 2, 3, 4, 5)%
-	spellRank = select(5, GetTalentInfo(1, 14));
+	spellRank = select(5, CSC_GetTalentInfo(1, 14));
 	if (spellRank > 0) and (spellRank <= 5) then
 		forceOfWillCrit = critTable[spellRank];
 	end
@@ -86,14 +133,14 @@ end
 -- returns the healing modifier from Spiritual Healing talent for Priests
 function CSC_GetPriestBonusHealingModifierFromTalents()
 	-- Spiritual Healing
-	local spellRank = select(5, GetTalentInfo(2, 15));
+	local spellRank = select(5, CSC_GetTalentInfo(2, 15));
 	return spellRank * 0.02;
 end
 
 -- returns the crit bonus from Holy Power
 function CSC_GetPaladinCritStatsFromTalents()
 	-- Holy Power (1, 2, 3, 4, 5)%
-	local spellRank = select(5, GetTalentInfo(1, 13));
+	local spellRank = select(5, CSC_GetTalentInfo(1, 13));
 
 	return spellRank;
 end
@@ -105,7 +152,7 @@ local function CSC_GetPaladinDefenseFromTalents()
     local defenseTable = { 2, 4, 6, 8, 10 };
 
     -- Anticipation (2, 4, 6, 8, 10)%
-    local spellRank = select(5, GetTalentInfo(2, 9));
+    local spellRank = select(5, CSC_GetTalentInfo(2, 9));
     if (spellRank > 0) and (spellRank <=5) then
         defense = defenseTable[spellRank];
     end
@@ -116,7 +163,7 @@ end
 -- returns the modifier from Improved Blessing of Wisdom Holy talent
 function CSC_GetPaladinImprovedBoWModifier()
 	-- Improved Blessing of Wisdom
-	local spellRank = select(5, GetTalentInfo(1, 10));
+	local spellRank = select(5, CSC_GetTalentInfo(1, 10));
 
 	return spellRank * 0.1;
 end
@@ -138,7 +185,7 @@ local function CSC_GetWarriorDefenseFromTalents()
     local defenseTable = { 2, 4, 6, 8, 10 };
 
     -- Anticipation (2, 4, 6, 8, 10)%
-    local spellRank = select(5, GetTalentInfo(3, 2));
+    local spellRank = select(5, CSC_GetTalentInfo(3, 2));
     if (spellRank > 0) and (spellRank <=5) then
 		defense = defenseTable[spellRank];
 	end
@@ -176,7 +223,7 @@ end
 -- returns the bonus hit from Nature's Guidance talent (counts as melee and spell hit)
 function CSC_GetShamanHitFromTalents()
 	-- Nature's Guidance
-	local spellRank = select(5, GetTalentInfo(3, 6));
+	local spellRank = select(5, CSC_GetTalentInfo(3, 6));
 	return spellRank;
 end
 
@@ -186,7 +233,7 @@ function CSC_GetShamanCallOfThunderCrit()
 	local talentTable = { 1, 2, 3, 4, 6 };
 
 	-- Call of Thunder (Lightning)
-	local spellRank = select(5, GetTalentInfo(1, 8));
+	local spellRank = select(5, CSC_GetTalentInfo(1, 8));
 
     if (spellRank > 0) and (spellRank <=5) then
 		bonusCrit = talentTable[spellRank];
@@ -198,7 +245,7 @@ end
 -- returns the bonus crit from the Tidal Mastery telent for Shamans
 function CSC_GetShamanTidalMasteryCrit()
 	-- Tidal Mastery (Nature/Lightning)
-	local spellRank = select(5, GetTalentInfo(3, 11));
+	local spellRank = select(5, CSC_GetTalentInfo(3, 11));
 	return spellRank;
 end
 
@@ -209,13 +256,13 @@ function CSC_GetMP5ModifierFromTalents(unit)
 
 	if unitClassId == CSC_PRIEST_CLASS_ID then
 		-- Meditation
-        spellRank = select(5, GetTalentInfo(1, 8));
+        spellRank = select(5, CSC_GetTalentInfo(1, 8));
 	elseif unitClassId == CSC_MAGE_CLASS_ID then
 		-- Arcane Meditation
-		spellRank = select(5, GetTalentInfo(1, 12));
+		spellRank = select(5, CSC_GetTalentInfo(1, 12));
 	elseif unitClassId == CSC_DRUID_CLASS_ID then
 		-- Reflection
-        spellRank = select(5, GetTalentInfo(3, 6));
+        spellRank = select(5, CSC_GetTalentInfo(3, 6));
 	end
 	
 	local modifier = spellRank * 0.05;
