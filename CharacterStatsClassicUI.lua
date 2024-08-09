@@ -5,7 +5,7 @@ core.UIConfig = {};
 
 -- Defaults
 UISettingsGlobal = {
-    useBlizzardBlockValue = false;
+    useBlizzardBlockValue = true;
     useTransparentStatsBackground = true;
     statsPanelHidden = false;
 }
