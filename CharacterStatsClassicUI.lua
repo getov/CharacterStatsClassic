@@ -1,6 +1,7 @@
 -- Namespaces
 -- core - table (namespace) shared between every lua file
 local addonName, core = ...;
+local category, layout
 core.UIConfig = {};
 
 -- Defaults
@@ -195,7 +196,10 @@ function UIConfig:SetupConfigInterface()
 
     CSC_ConfigFrame = CreateFrame("Frame", "CSC_InterfaceOptionsPanel", UIParent);
     CSC_ConfigFrame.name = "CharacterStatsClassic";
-    InterfaceOptions_AddCategory(CSC_ConfigFrame);
+
+    category, layout = Settings.RegisterCanvasLayoutCategory(CSC_ConfigFrame, CSC_ConfigFrame.name, CSC_ConfigFrame.name);
+    category.ID = CSC_ConfigFrame.name
+    Settings.RegisterAddOnCategory(category);
 
     -- Title and font
     CSC_ConfigFrame.title = CreateFrame("Frame", "CharacterStatsClassic", CSC_ConfigFrame);
