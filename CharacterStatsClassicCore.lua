@@ -29,8 +29,7 @@ characterStatsClassicEventFrame:SetScript("OnEvent",
 
         -- Simple check: Don't update if LFG frames exist and are visible
         if (LFGListingFrame and LFGListingFrame:IsVisible()) or 
-           (LFGListFrame and LFGListFrame:IsVisible()) or
-           InCombatLockdown() then
+           (LFGListFrame and LFGListFrame:IsVisible()) then
             return;
         end
 
@@ -68,8 +67,7 @@ function CSC_QueuedUpdate(self)
     
     -- Double-check before updating
     if (LFGListingFrame and LFGListingFrame:IsVisible()) or 
-       (LFGListFrame and LFGListFrame:IsVisible()) or
-       InCombatLockdown() then
+       (LFGListFrame and LFGListFrame:IsVisible()) then
         return;
     end
     
