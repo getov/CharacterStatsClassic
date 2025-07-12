@@ -27,6 +27,13 @@ characterStatsClassicEventFrame:SetScript("OnEvent",
             CSC_GenerateTalentsIndexMap();                
         end
 
+        -- Simple check: Don't update if LFG frames exist and are visible
+        if (LFGListingFrame and LFGListingFrame:IsVisible()) or 
+           (LFGListFrame and LFGListFrame:IsVisible()) or
+           InCombatLockdown() then
+            return;
+        end
+
         if (not core.UIConfig.CharacterStatsPanel:IsVisible()) then
             return;
         end
@@ -58,6 +65,14 @@ characterStatsClassicEventFrame:SetScript("OnEvent",
 
 function CSC_QueuedUpdate(self)
     self:SetScript("OnUpdate", nil);
+    
+    -- Double-check before updating
+    if (LFGListingFrame and LFGListingFrame:IsVisible()) or 
+       (LFGListFrame and LFGListFrame:IsVisible()) or
+       InCombatLockdown() then
+        return;
+    end
+    
     core.UIConfig:UpdateStats();
 end
 
