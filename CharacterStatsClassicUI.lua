@@ -208,7 +208,7 @@ function UIConfig:SetupConfigInterface()
     CSC_ConfigFrame.titleString = CSC_ConfigFrame.title:CreateFontString(nil, "OVERLAY", "GameFontNormal");
     CSC_ConfigFrame.titleString:SetPoint("TOPLEFT", CSC_ConfigFrame, "TOPLEFT", 10, -10);
     CSC_ConfigFrame.titleString:SetText('|cff00c0ffCharacterStatsClassic|r');
-    CSC_ConfigFrame.titleString:SetFont("Fonts\\FRIZQT__.tff", 20, "OUTLINE");
+    CSC_ConfigFrame.titleString:SetFont("Fonts\\FRIZQT__.TTF", 20, "OUTLINE");
 
     -- Checkboxes
     CSC_ConfigFrame.chkBtnUseBlizzardBlockValue = CreateFrame("CheckButton", "default", CSC_ConfigFrame, "UICheckButtonTemplate");

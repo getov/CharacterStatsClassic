@@ -13,20 +13,20 @@ CSC_DRUID_CLASS_ID 			= 11;
 CSC_DEMONHUNTER_CLASS_ID 	= 12;
 
 g_WeaponStringByWeaponId = {
-	[LE_ITEM_WEAPON_AXE1H] 		= CSC_WEAPON_AXE1H_TXT,
-	[LE_ITEM_WEAPON_AXE2H] 		= CSC_WEAPON_AXE2H_TXT,
-	[LE_ITEM_WEAPON_MACE1H] 	= CSC_WEAPON_MACE1H_TXT,
-	[LE_ITEM_WEAPON_MACE2H] 	= CSC_WEAPON_MACE2H_TXT,
-	[LE_ITEM_WEAPON_POLEARM] 	= CSC_WEAPON_POLEARM_TXT,
-	[LE_ITEM_WEAPON_SWORD1H] 	= CSC_WEAPON_SWORD1H_TXT,
-	[LE_ITEM_WEAPON_SWORD2H] 	= CSC_WEAPON_SWORD2H_TXT,
-	[LE_ITEM_WEAPON_STAFF] 		= CSC_WEAPON_STAFF_TXT,
-	[LE_ITEM_WEAPON_UNARMED] 	= CSC_WEAPON_UNARMED_TXT,
-    [LE_ITEM_WEAPON_DAGGER] 	= CSC_WEAPON_DAGGER_TXT,
-    [LE_ITEM_WEAPON_BOWS]       = CSC_WEAPON_BOW_TXT,
-    [LE_ITEM_WEAPON_CROSSBOW]   = CSC_WEAPON_CROSSBOW_TXT,
-    [LE_ITEM_WEAPON_GUNS]       = CSC_WEAPON_GUN_TXT
-};
+    [Enum.ItemWeaponSubclass.Axe1H]     = CSC_WEAPON_AXE1H_TXT,
+    [Enum.ItemWeaponSubclass.Axe2H]     = CSC_WEAPON_AXE2H_TXT,
+    [Enum.ItemWeaponSubclass.Mace1H]    = CSC_WEAPON_MACE1H_TXT,
+    [Enum.ItemWeaponSubclass.Mace2H]    = CSC_WEAPON_MACE2H_TXT,
+    [Enum.ItemWeaponSubclass.Polearm]   = CSC_WEAPON_POLEARM_TXT,
+    [Enum.ItemWeaponSubclass.Sword1H]   = CSC_WEAPON_SWORD1H_TXT,
+    [Enum.ItemWeaponSubclass.Sword2H]   = CSC_WEAPON_SWORD2H_TXT,
+    [Enum.ItemWeaponSubclass.Staff]     = CSC_WEAPON_STAFF_TXT,
+    [Enum.ItemWeaponSubclass.Unarmed]   = CSC_WEAPON_UNARMED_TXT,
+    [Enum.ItemWeaponSubclass.Dagger]    = CSC_WEAPON_DAGGER_TXT,
+    [Enum.ItemWeaponSubclass.Bows]      = CSC_WEAPON_BOW_TXT,
+    [Enum.ItemWeaponSubclass.Crossbow]  = CSC_WEAPON_CROSSBOW_TXT,
+    [Enum.ItemWeaponSubclass.Guns]      = CSC_WEAPON_GUN_TXT
+}
 
 -- Class set items IDs
 g_BattlegearOfMightIds = { 
@@ -132,4 +132,22 @@ g_ArgentDawnSPItems = {
 
 CSC_SYMBOL_TAB   = "    "; -- for some reason "\t" doesn't work
 CSC_SYMBOL_SPACE = " ";
+
+INVSLOT_HEAD      = GetInventorySlotInfo("HeadSlot")
+INVSLOT_NECK      = GetInventorySlotInfo("NeckSlot")
+INVSLOT_SHOULDER  = GetInventorySlotInfo("ShoulderSlot")
+INVSLOT_CHEST     = GetInventorySlotInfo("ChestSlot")
+INVSLOT_WAIST     = GetInventorySlotInfo("WaistSlot")
+INVSLOT_LEGS      = GetInventorySlotInfo("LegsSlot")
+INVSLOT_FEET      = GetInventorySlotInfo("FeetSlot")
+INVSLOT_WRIST     = GetInventorySlotInfo("WristSlot")
+INVSLOT_HAND      = GetInventorySlotInfo("HandsSlot")
+INVSLOT_FINGER1   = GetInventorySlotInfo("Finger0Slot")
+INVSLOT_FINGER2   = GetInventorySlotInfo("Finger1Slot")
+INVSLOT_TRINKET1  = GetInventorySlotInfo("Trinket0Slot")
+INVSLOT_TRINKET2  = GetInventorySlotInfo("Trinket1Slot")
+INVSLOT_BACK      = GetInventorySlotInfo("BackSlot")
+INVSLOT_MAINHAND  = GetInventorySlotInfo("MainHandSlot")
+INVSLOT_OFFHAND   = GetInventorySlotInfo("SecondaryHandSlot")
+INVSLOT_RANGED    = GetInventorySlotInfo("RangedSlot")
                                 
